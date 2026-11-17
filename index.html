@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>David Tsoy Portfolio</title>
+<meta name="description" content="David Tsoy, Industrial Design student at KAIST. Product, print and interface work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..700&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a quiet drawing sheet. 12-column grid, every project opens with a
+   title block like an industrial-design technical drawing; one amber "lamp glow" accent. */
+:root{
+  --paper:#EFEFEB;
+  --paper-deep:#E3E4DE;
+  --ink:#1B1D1C;
+  --ink-soft:#5D615D;
+  --line:#CFD0C9;
+  --glow:#C98C3E;
+  --night:#191A19;
+  --night-ink:#ECEAE4;
+  --night-soft:#9C9a93;
+  --night-line:#34352F;
+
+  --display:"Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --body:"Geist", "Helvetica Neue", Arial, sans-serif;
+  --mono:"Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --t-hero:clamp(64px, 12vw, 176px);
+  --t-h2:clamp(38px, 5.4vw, 76px);
+  --t-h3:clamp(22px, 2.2vw, 28px);
+  --t-body:17px;
+  --t-small:14px;
+  --t-mono:11.5px;
+
+  --gutter:clamp(18px, 4vw, 56px);
+  --max:1360px;
+  --ease:cubic-bezier(.2,.7,.1,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:clip}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:var(--t-body);line-height:1.6;font-weight:380;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block;height:auto}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--glow);outline-offset:3px;border-radius:2px}
+::selection{background:var(--glow);color:#fff}
+
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+.mono{font-family:var(--mono);font-size:var(--t-mono);letter-spacing:.08em;text-transform:uppercase;font-weight:400}
+.soft{color:var(--ink-soft)}
+h1,h2,h3{font-family:var(--display);font-weight:450;text-wrap:balance;font-variation-settings:"opsz" 96}
+h2{font-size:var(--t-h2);line-height:1;letter-spacing:-.035em;overflow-wrap:break-word}
+h3{font-size:var(--t-h3);line-height:1.2;letter-spacing:-.015em;font-weight:500}
+p{max-width:62ch}
+
+/* ---------- progress + nav ---------- */
+.progress{position:fixed;top:0;left:0;height:2px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:var(--glow);z-index:60}
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;transition:transform .5s var(--ease), background .3s}
+.nav.hide{transform:translateY(-100%)}
+.nav.solid{background:color-mix(in srgb, var(--paper) 82%, transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid color-mix(in srgb, var(--line) 60%, transparent)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
+.brand{font-family:var(--display);font-weight:600;font-size:17px;text-decoration:none;letter-spacing:-.01em}
+.nav ul{list-style:none;display:flex;gap:clamp(14px,3vw,34px);align-items:center}
+.nav a.l{text-decoration:none;font-size:14px;position:relative;padding:4px 0}
+.nav a.l::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .45s var(--ease)}
+.nav a.l:hover::after,.nav a.l.active::after{transform:scaleX(1);transform-origin:left}
+.status{display:inline-flex;align-items:center;gap:8px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--glow);box-shadow:0 0 0 0 color-mix(in srgb,var(--glow) 60%,transparent);animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--glow) 55%,transparent)}70%{box-shadow:0 0 0 9px transparent}100%{box-shadow:0 0 0 0 transparent}}
+@media (max-width:720px){.nav .status{display:none}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding:128px 0 72px;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center}
+.hero-text{grid-column:1 / span 7;position:relative;z-index:2}
+.hero-fig{grid-column:8 / span 5;position:relative;z-index:1}
+.eyebrow{display:flex;gap:10px;align-items:center;margin-bottom:28px;color:var(--ink-soft)}
+.eyebrow .bar{width:28px;height:1px;background:var(--ink-soft)}
+.name{font-size:var(--t-hero);line-height:.86;letter-spacing:-.055em;font-weight:440;font-variation-settings:"opsz" 96,"wdth" 88;margin-left:-.04em}
+.name .row{display:block;overflow:hidden;padding-bottom:.06em}
+.name .ch{display:inline-block;transform:translateY(105%);animation:rise 1.1s var(--ease) forwards}
+.name .row:nth-child(2){color:var(--ink-soft)}
+@keyframes rise{to{transform:none}}
+.lede{margin-top:32px;font-size:clamp(18px,1.6vw,21px);line-height:1.5;max-width:40ch;color:var(--ink)}
+.lede em{font-style:normal;color:var(--glow)}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:13px 22px;border-radius:999px;text-decoration:none;font-size:15px;border:1px solid var(--ink);transition:background .35s var(--ease),color .35s var(--ease),transform .35s var(--ease)}
+.btn.fill{background:var(--ink);color:var(--paper)}
+.btn:hover{transform:translateY(-2px)}
+.btn.fill:hover{background:var(--glow);border-color:var(--glow)}
+.btn.line:hover{background:var(--ink);color:var(--paper)}
+.btn .arr{transition:transform .35s var(--ease)}
+.btn:hover .arr{transform:translateX(3px)}
+.meta-row{display:grid;grid-template-columns:repeat(4,auto);justify-content:start;gap:12px 36px;margin-top:52px;padding-top:20px;border-top:1px solid var(--line);max-width:640px}
+.meta-row div{display:flex;flex-direction:column;gap:4px}
+.meta-row .v{font-size:14px}
+.fade-in{opacity:0;animation:fade 1s var(--ease) forwards}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.web-box{position:relative;aspect-ratio:1/1;width:100%;max-width:560px;margin-left:auto}
+.web-box canvas{position:absolute;inset:0;width:100%;height:100%}
+.web-glow{position:absolute;width:70%;aspect-ratio:1;left:15%;top:15%;border-radius:50%;background:radial-gradient(circle, color-mix(in srgb,var(--glow) 34%,transparent) 0%, transparent 62%);filter:blur(10px);pointer-events:none;transition:opacity .6s}
+.fig-cap{display:flex;justify-content:space-between;gap:16px;margin-top:10px;color:var(--ink-soft);max-width:560px;margin-left:auto}
+@media (max-width:900px){
+  .hero{padding-top:104px}
+  .hero-text{grid-column:1 / -1}
+  .hero-fig{grid-column:1 / -1;order:-1;margin:-8px auto -24px;width:min(74vw,360px)}
+  .hero-fig .fig-cap{display:none}
+  .name{font-size:clamp(72px,24vw,140px)}
+  .meta-row{grid-template-columns:repeat(2,auto)}
+}
+
+/* ---------- section heads ---------- */
+section{position:relative}
+.sec{padding:clamp(80px,11vw,150px) 0 0}
+.sec-head{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:end;margin-bottom:clamp(36px,5vw,64px)}
+.sec-head .k{grid-column:1 / span 3;color:var(--ink-soft)}
+.sec-head h2{grid-column:4 / -1}
+@media (max-width:900px){.sec-head .k,.sec-head h2{grid-column:1 / -1}}
+
+/* ---------- work index ---------- */
+.index{border-top:1px solid var(--line)}
+.index a{display:grid;grid-template-columns:64px 1.5fr 1fr 1.2fr 28px;gap:20px;align-items:center;padding:26px 0;border-bottom:1px solid var(--line);text-decoration:none;position:relative}
+.index a::before{content:"";position:absolute;inset:0;background:var(--paper-deep);transform:scaleY(0);transform-origin:bottom;transition:transform .5s var(--ease);z-index:-1}
+.index a:hover::before{transform:scaleY(1)}
+.index .t{font-family:var(--display);font-size:clamp(22px,2.6vw,34px);letter-spacing:-.025em;line-height:1.1;font-weight:450;transition:transform .5s var(--ease)}
+.index a:hover .t{transform:translateX(10px)}
+.index .go{justify-self:end;transition:transform .5s var(--ease)}
+.index a:hover .go{transform:rotate(-45deg)}
+.index .thumb{display:none}
+.index .n{color:var(--ink-soft)}
+@media (max-width:900px){
+  .index a{grid-template-columns:76px 1fr 24px;gap:6px 16px;padding:18px 0}
+  .index .thumb{display:block;grid-row:1 / span 2;width:76px;aspect-ratio:4/3;object-fit:cover;border-radius:6px}
+  .index .n,.index .fmt{display:none}
+  .index .t{grid-column:2}
+  .index .d{grid-column:2;grid-row:2}
+  .index .go{grid-column:3;grid-row:1 / span 2}
+}
+.peek{position:fixed;left:0;top:0;width:300px;aspect-ratio:4/3;pointer-events:none;z-index:40;border-radius:10px;overflow:hidden;opacity:0;transform:translate(-50%,-50%) scale(.85);transition:opacity .35s var(--ease), scale .35s var(--ease);box-shadow:0 30px 60px -20px rgba(20,20,18,.35)}
+.peek.on{opacity:1}
+.peek img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s}
+.peek img.cur{opacity:1}
+@media (hover:none),(max-width:900px){.peek{display:none}}
+
+/* ---------- case studies ---------- */
+.case{padding:clamp(90px,12vw,170px) 0 0}
+.case-head{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:end}
+.case-head .num{grid-column:1 / span 2;font-family:var(--mono);font-size:13px;color:var(--ink-soft);align-self:start;padding-top:12px}
+.case-head .titles{grid-column:3 / -1}
+.case-head .sub{margin-top:18px;font-size:clamp(18px,1.6vw,21px);color:var(--ink-soft);max-width:46ch;line-height:1.45}
+@media (max-width:900px){.case-head .num,.case-head .titles{grid-column:1 / -1}}
+
+/* title block, like the corner of a technical drawing */
+.tblock{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);margin:clamp(32px,4vw,48px) 0;border-radius:2px}
+.tblock div{padding:14px 16px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:6px;min-width:0}
+.tblock div:last-child{border-right:0}
+.tblock .mono{color:var(--ink-soft);font-size:10.5px}
+.tblock .v{font-size:14.5px;line-height:1.35}
+@media (max-width:760px){.tblock{grid-template-columns:1fr 1fr}.tblock div:nth-child(2){border-right:0}.tblock div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(14px,2vw,24px)}
+.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-7{grid-column:span 7}.span-6{grid-column:span 6}.span-5{grid-column:span 5}.span-4{grid-column:span 4}.span-3{grid-column:span 3}
+@media (max-width:900px){.grid > *{grid-column:1 / -1 !important}}
+@media (min-width:560px) and (max-width:900px){.grid .pair{grid-column:span 6 !important}}
+
+.shot{position:relative;overflow:hidden;border-radius:6px;background:var(--paper-deep);cursor:zoom-in}
+.shot img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease)}
+.shot:hover img{transform:scale(1.035)}
+.shot.contain{background:#fff}
+.shot.contain img{object-fit:contain}
+figcaption{display:flex;gap:12px;align-items:baseline;margin-top:10px;font-size:13.5px;color:var(--ink-soft);line-height:1.4}
+figcaption .mono{flex:none}
+
+.copy{display:flex;flex-direction:column;gap:18px}
+.copy p{color:var(--ink)}
+.copy p.soft{color:var(--ink-soft)}
+
+.triad{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);margin-top:8px}
+.triad div{padding:18px 18px 4px 0;display:flex;flex-direction:column;gap:6px}
+.triad div + div{padding-left:18px;border-left:1px solid var(--line)}
+.triad .eq{font-family:var(--display);font-size:20px;letter-spacing:-.01em;font-weight:500}
+.triad p{font-size:14.5px;color:var(--ink-soft);line-height:1.5}
+@media (max-width:560px){.triad{grid-template-columns:1fr}.triad div + div{padding-left:0;border-left:0;border-top:1px solid var(--line)}}
+
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:18px}
+.steps div{border-top:1px solid var(--ink);padding-top:12px;display:flex;flex-direction:column;gap:4px}
+.steps b{font-weight:500;font-size:15px}
+.steps span{font-size:13.5px;color:var(--ink-soft);line-height:1.45}
+@media (max-width:760px){.steps{grid-template-columns:1fr 1fr}}
+
+.quote{padding:clamp(56px,8vw,110px) 0;text-align:left}
+.quote blockquote{font-family:var(--display);font-size:clamp(28px,4vw,54px);line-height:1.12;letter-spacing:-.03em;max-width:22ch;font-weight:400;font-variation-settings:"opsz" 96}
+.quote blockquote .hl{color:var(--glow)}
+.quote cite{display:block;margin-top:22px;font-style:normal}
+
+.note{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-left:2px solid var(--glow);background:color-mix(in srgb,var(--glow) 8%,transparent);font-size:14.5px;line-height:1.5;max-width:62ch;border-radius:0 4px 4px 0}
+
+/* dark band for H-Dry */
+.night{background:var(--night);color:var(--night-ink);margin-top:clamp(90px,12vw,170px);padding-bottom:clamp(80px,10vw,140px)}
+.night .case{padding-top:clamp(80px,10vw,130px)}
+.night .soft,.night .case-head .num,.night .case-head .sub,.night figcaption,.night .tblock .mono{color:var(--night-soft)}
+.night .tblock,.night .tblock div{border-color:var(--night-line)}
+.night .shot{background:#222320}
+.night .copy p{color:var(--night-ink)}
+.complaints{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;border-top:1px solid var(--night-line);border-bottom:1px solid var(--night-line);padding:30px 0;margin:clamp(40px,5vw,64px) 0}
+.complaints div{display:flex;flex-direction:column;gap:10px}
+.complaints .w{font-family:var(--display);font-size:clamp(28px,3.4vw,46px);letter-spacing:-.03em;line-height:1;font-weight:400}
+.complaints .w s{text-decoration-thickness:2px;text-decoration-color:var(--glow)}
+.complaints p{font-size:14.5px;color:var(--night-soft)}
+@media (max-width:700px){.complaints{grid-template-columns:1fr}}
+.parts{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.parts th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:400;text-align:left;color:var(--night-soft);padding:0 10px 10px 0;border-bottom:1px solid var(--night-line)}
+.parts td{padding:10px 10px 10px 0;border-bottom:1px solid var(--night-line);vertical-align:top}
+.parts td:first-child{font-family:var(--mono);color:var(--glow);width:44px}
+.parts tr{transition:background .25s}
+.parts tbody tr:hover{background:#232421}
+
+/* booklet gallery */
+.rail-wrap{position:relative;margin-top:8px}
+.rail{display:flex;gap:clamp(14px,2vw,22px);overflow-x:auto;scroll-snap-type:x mandatory;padding:4px var(--gutter) 22px;scrollbar-width:none;cursor:grab;overscroll-behavior-x:contain}
+.rail::-webkit-scrollbar{display:none}
+.rail.drag{cursor:grabbing;scroll-snap-type:none}
+.rail figure{flex:none;scroll-snap-align:center}
+.rail .shot{height:clamp(300px,42vw,520px);background:#fff;box-shadow:0 1px 0 var(--line), 0 24px 50px -30px rgba(20,20,18,.35)}
+.rail .shot img{width:auto;height:100%;object-fit:contain;pointer-events:none}
+.rail-ui{display:flex;align-items:center;gap:18px;padding:0 var(--gutter);max-width:var(--max);margin:0 auto}
+.rail-bar{flex:1;height:1px;background:var(--line);position:relative}
+.rail-bar i{position:absolute;left:0;top:-1px;height:3px;background:var(--ink);width:20%;transition:transform .2s linear}
+.round{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;transition:background .3s,border-color .3s,color .3s}
+.round:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:clamp(28px,4vw,44px)}
+.stats div{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px}
+.stats .big{font-family:var(--display);font-size:clamp(30px,3.4vw,46px);letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;font-weight:400}
+.stats .big.red{color:#B8483A}
+.stats p{font-size:14px;color:var(--ink-soft);line-height:1.45}
+@media (max-width:760px){.stats{grid-template-columns:1fr 1fr}}
+
+/* ---------- about ---------- */
+.about-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+.about-lead{grid-column:1 / span 6}
+.about-lead p.big{font-family:var(--display);font-size:clamp(24px,2.5vw,32px);line-height:1.25;letter-spacing:-.02em;max-width:24ch;font-weight:400}
+.about-lead p + p{margin-top:22px;color:var(--ink-soft)}
+.cv{grid-column:8 / -1;display:flex;flex-direction:column;gap:34px}
+.cv h3{font-family:var(--mono);font-size:var(--t-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);font-weight:400;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.cv li{list-style:none;display:grid;grid-template-columns:92px 1fr;gap:16px;padding:12px 0;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent);font-size:15px;line-height:1.45}
+.cv li .y{font-family:var(--mono);font-size:12px;color:var(--ink-soft);padding-top:2px;font-variant-numeric:tabular-nums}
+.cv li small{display:block;color:var(--ink-soft);font-size:13.5px;margin-top:3px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding-top:10px}
+.chips span{padding:7px 13px;border:1px solid var(--line);border-radius:999px;font-size:13.5px;transition:background .3s,border-color .3s}
+.chips span:hover{background:var(--paper-deep);border-color:var(--ink-soft)}
+.chip-group{display:grid;grid-template-columns:92px 1fr;gap:16px;align-items:start;padding:8px 0}
+.chip-group .y{font-family:var(--mono);font-size:12px;color:var(--ink-soft);padding-top:18px}
+@media (max-width:900px){.about-lead,.cv{grid-column:1 / -1}}
+
+/* ---------- contact ---------- */
+.contact{padding:clamp(100px,13vw,180px) 0 40px}
+.contact .k{color:var(--ink-soft);margin-bottom:22px}
+.mail{display:inline-block;font-family:var(--display);font-size:clamp(34px,6.4vw,96px);letter-spacing:-.045em;line-height:1;text-decoration:none;font-weight:420;position:relative;word-break:break-word}
+.mail::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:var(--glow);transform:scaleX(.18);transform-origin:left;transition:transform .7s var(--ease)}
+.mail:hover::after{transform:scaleX(1)}
+.contact-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:40px;align-items:center}
+.footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:clamp(80px,10vw,140px);padding:22px 0 30px;border-top:1px solid var(--line);color:var(--ink-soft)}
+
+/* ---------- reveal (elements stay visible; they only settle into place) ---------- */
+.rv.arm{opacity:.35;transform:translateY(28px)}
+.rv{transition:opacity 1s var(--ease), transform 1.1s var(--ease)}
+.rv.in{opacity:1;transform:none}
+
+/* ---------- lightbox ---------- */
+.lb{position:fixed;inset:0;z-index:80;background:color-mix(in srgb,var(--paper) 94%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;place-items:center;padding:60px var(--gutter) 40px;opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+.lb.open{opacity:1;pointer-events:auto}
+.lb img{max-height:calc(100vh - 140px);max-width:100%;width:auto;object-fit:contain;border-radius:4px;box-shadow:0 40px 80px -40px rgba(0,0,0,.4);transform:scale(.96);transition:transform .5s var(--ease)}
+.lb.open img{transform:none}
+.lb .cap{margin-top:14px;color:var(--ink-soft);font-size:14px;text-align:center}
+.lb .x{position:absolute;top:16px;right:var(--gutter)}
+
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .35s,transform .35s var(--ease);z-index:90;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-delay:0ms !important;transition-duration:.001ms !important;scroll-behavior:auto !important}
+  .name .ch{transform:none}
+  .fade-in{opacity:1}
+  .rv.arm{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top">David Tsoy</a>
+    <ul>
+      <li class="status mono soft"><span class="dot"></span>Open to UX/UI internships</li>
+      <li><a class="l" href="#work">Work</a></li>
+      <li><a class="l" href="#about">About</a></li>
+      <li><a class="l" href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-text">
+        <div class="eyebrow mono fade-in" style="animation-delay:.1s"><span class="bar"></span>Industrial Design · KAIST · Daejeon</div>
+        <h1 class="name" aria-label="David Tsoy">
+          <span class="row" data-split>David</span>
+          <span class="row" data-split>Tsoy</span>
+        </h1>
+        <p class="lede fade-in" style="animation-delay:.9s">I design products, print and interfaces. Third-year Industrial Design student with a double major in Computer Science, so I can <em>draw it, model it and build it</em>.</p>
+        <div class="ctas fade-in" style="animation-delay:1.05s">
+          <a class="btn fill" href="#work">See selected work <span class="arr">→</span></a>
+          <a class="btn line" href="#contact">Get in touch</a>
+        </div>
+        <div class="meta-row fade-in" style="animation-delay:1.2s">
+          <div><span class="mono soft">Based in</span><span class="v">Daejeon, KR</span></div>
+          <div><span class="mono soft">From</span><span class="v">Almaty, KZ</span></div>
+          <div><span class="mono soft">Studying</span><span class="v">KAIST, 2024–2028</span></div>
+          <div><span class="mono soft">Speaks</span><span class="v">RU · EN · KO</span></div>
+        </div>
+      </div>
+      <div class="hero-fig fade-in" style="animation-delay:.2s">
+        <div class="web-box" id="webBox">
+          <div class="web-glow" id="webGlow"></div>
+          <canvas id="web" aria-hidden="true"></canvas>
+        </div>
+        <div class="fig-cap mono"><span>Fig. 01 · the web behind the www lamp</span><span class="hint">Move to light it</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK INDEX -->
+  <section class="sec" id="work">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <span class="k mono">Selected work · 2025–2026</span>
+        <h2>Five projects, from a lamp you can print to a page you can climb.</h2>
+      </div>
+      <nav class="index rv" aria-label="Project index">
+        <a href="#p-lamp" data-peek="img/lamp-final.jpg"><img class="thumb" src="img/lamp-final.jpg" alt="" loading="lazy"><span class="n mono">01</span><span class="t">www.world_wide_web</span><span class="d soft">Pendant lamp</span><span class="fmt mono soft">Rhino 7 · 3D print</span><span class="go">↘</span></a>
+        <a href="#p-hdry" data-peek="img/hdry-hero.jpg"><img class="thumb" src="img/hdry-hero.jpg" alt="" loading="lazy"><span class="n mono">02</span><span class="t">H-Dry</span><span class="d soft">Hair dryer</span><span class="fmt mono soft">CAD · KeyShot · Drawing</span><span class="go">↘</span></a>
+        <a href="#p-monaco" data-peek="img/monaco-hero.jpg"><img class="thumb" src="img/monaco-hero.jpg" alt="" loading="lazy"><span class="n mono">03</span><span class="t">Circuit de Monaco Perfectionniste</span><span class="d soft">Award trophy</span><span class="fmt mono soft">CAD · KeyShot · Drawing</span><span class="go">↘</span></a>
+        <a href="#p-summer" data-peek="img/bk-home.jpg"><img class="thumb" src="img/bk-home.jpg" alt="" loading="lazy"><span class="n mono">04</span><span class="t">Summer 2025</span><span class="d soft">Visual diary booklet</span><span class="fmt mono soft">Print · 14 pages A4</span><span class="go">↘</span></a>
+        <a href="#p-mountain" data-peek="img/wiki-detail.jpg"><img class="thumb" src="img/wiki-detail.jpg" alt="" loading="lazy"><span class="n mono">05</span><span class="t">Mountain</span><span class="d soft">Editorial information design</span><span class="fmt mono soft">Print · A3 spread</span><span class="go">↘</span></a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- 01 LAMP -->
+  <section class="case" id="p-lamp">
+    <div class="wrap">
+      <div class="case-head rv">
+        <span class="num">01 / 05</span>
+        <div class="titles">
+          <h2>www.<wbr>world_<wbr>wide_<wbr>web</h2>
+          <p class="sub">A pendant lamp that spins a web of light across the room, connecting the people beneath it the way the Internet connects the world.</p>
+        </div>
+      </div>
+      <div class="tblock rv">
+        <div><span class="mono">Course</span><span class="v">Design Studio II</span></div>
+        <div><span class="mono">Instructor</span><span class="v">Prof. Sangmin Bae</span></div>
+        <div><span class="mono">Tools</span><span class="v">Rhino 7, Gemini for references</span></div>
+        <div><span class="mono">Output</span><span class="v">3D-printed, working lamp · 2026</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="copy span-5 rv">
+          <h3>A web wrapped around the world</h3>
+          <p>Spider webs come together into a sphere: the Earth, held together by the network that connects everyone on it. When the bulb turns on, the web's shadow falls across the walls and onto everyone in the room.</p>
+          <div class="triad">
+            <div><span class="mono soft">Form</span><span class="eq">Sphere = Earth</span><p>Webs rotated into a sphere stand for the whole world.</p></div>
+            <div><span class="mono soft">Structure</span><span class="eq">Web = Network</span><p>Threads are connections spread across the globe.</p></div>
+            <div><span class="mono soft">Light</span><span class="eq">Glow = Bond</span><p>The lit web falls on people and ties them together.</p></div>
+          </div>
+        </div>
+        <figure class="span-7 rv">
+          <div class="shot" style="aspect-ratio:1300/1400"><img src="img/lamp-hero.jpg" width="1300" height="1708" alt="Render of the www pendant lamp, a sphere of curved web-like tubes" loading="lazy"></div>
+          <figcaption><span class="mono">Render</span>Final form, modeled in Rhino 7.</figcaption>
+        </figure>
+      </div>
+
+      <div class="quote rv">
+        <blockquote>“Once you enter the Internet, it’s hard to get away, <span class="hl">like anything caught in a spider web.</span>”</blockquote>
+        <cite class="mono soft">Personal interpretation behind the concept</cite>
+      </div>
+
+      <div class="grid">
+        <figure class="span-12 rv">
+          <div class="shot" style="aspect-ratio:1800/569"><img src="img/lamp-dev.jpg" width="1800" height="569" alt="Rhino viewport showing the web curves, rotated sphere, tube version and holder cap" loading="lazy"></div>
+          <div class="steps">
+            <div><b>1 · Web curves</b><span>Drew one spider-web shape with curves.</span></div>
+            <div><b>2 · Rotate</b><span>Rotated copies around the axis into a sphere.</span></div>
+            <div><b>3 · MultiPipe</b><span>Turned the curves into smooth 3D tubes.</span></div>
+            <div><b>4 · Opening</b><span>Cut a hole on top for socket and bulb.</span></div>
+            <div><b>5 · Holder cap</b><span>Added a cap that holds the lamp on the socket.</span></div>
+          </div>
+        </figure>
+        <figure class="span-4 pair rv"><div class="shot" style="aspect-ratio:1060/626"><img src="img/lamp-rhino1.jpg" width="1060" height="626" alt="Web curves in top, front, right and perspective views" loading="lazy"></div><figcaption><span class="mono">A</span>Web curves in four views.</figcaption></figure>
+        <figure class="span-4 pair rv"><div class="shot" style="aspect-ratio:1060/626"><img src="img/lamp-rhino2.jpg" width="1060" height="626" alt="One web panel after MultiPipe" loading="lazy"></div><figcaption><span class="mono">B</span>One panel after MultiPipe.</figcaption></figure>
+        <figure class="span-4 pair rv"><div class="shot" style="aspect-ratio:1060/626"><img src="img/lamp-rhino3.jpg" width="1060" height="626" alt="Holder cap model" loading="lazy"></div><figcaption><span class="mono">C</span>Holder cap for the socket.</figcaption></figure>
+      </div>
+
+      <div class="grid" style="margin-top:clamp(40px,6vw,80px);align-items:center">
+        <figure class="span-6 rv">
+          <div class="shot" style="aspect-ratio:1300/1492"><img src="img/lamp-final.jpg" width="1300" height="1492" alt="Final render of the www pendant lamp" loading="lazy"></div>
+        </figure>
+        <div class="copy span-6 rv" style="padding-left:clamp(0px,3vw,40px)">
+          <h3>Radial rotation, three times</h3>
+          <p>A spider builds its web by circling one centre. The lamp repeats that motion: the spider spins outward thread by thread, one web is rotated copy after copy until it closes into a sphere, and light radiates from the centre until the shadow reaches the walls.</p>
+          <div class="note"><span class="mono" style="color:var(--glow)">AI</span><span>Gemini helped with mood images and geometry references. The 3D model was built by hand in Rhino 7, then 3D-printed as a fully working lamp.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 H-DRY -->
+  <div class="night" id="p-hdry">
+    <section class="case">
+      <div class="wrap">
+        <div class="case-head rv">
+          <span class="num">02 / 05</span>
+          <div class="titles">
+            <h2>H-Dry</h2>
+            <p class="sub">A hair dryer that starts from what people dislike about the ones they already own.</p>
+          </div>
+        </div>
+        <div class="tblock rv">
+          <div><span class="mono">Course</span><span class="v">Computer-Aided Design, final project</span></div>
+          <div><span class="mono">Instructor</span><span class="v">Prof. Jieun Shim</span></div>
+          <div><span class="mono">Tools</span><span class="v">3D CAD, KeyShot 10</span></div>
+          <div><span class="mono">Output</span><span class="v">Renders, assembly, exploded drawing · 2026</span></div>
+        </div>
+        <figure class="rv">
+          <div class="shot" style="aspect-ratio:1800/1012"><img src="img/hdry-hero.jpg" width="1800" height="1012" alt="H-Dry hair dryer render with a smoked translucent shell" loading="lazy"></div>
+        </figure>
+
+        <div class="complaints">
+          <div class="rv"><span class="mono soft">Benchmark 01</span><span class="w"><s>too bulky</s></span><p>Heavy, oversized heads.</p></div>
+          <div class="rv"><span class="mono soft">Benchmark 02</span><span class="w"><s>ordinary design</s></span><p>Shapes that all look alike.</p></div>
+          <div class="rv"><span class="mono soft">Benchmark 03</span><span class="w"><s>too short</s></span><p>Barrels that end too soon.</p></div>
+        </div>
+
+        <div class="grid">
+          <div class="copy span-5 rv">
+            <h3>A slim barrel you can see into</h3>
+            <p>H-Dry answers those three notes with a long, slim barrel and a smoked translucent shell, so the heating coil and the circuit board stay visible inside. The handle drops straight down from the body.</p>
+            <p class="soft">Every part was modeled, assembled and rendered in KeyShot, then documented as an exploded technical drawing with a parts list.</p>
+          </div>
+          <figure class="span-7 rv">
+            <div class="shot" style="aspect-ratio:1280/720"><img src="img/hdry-keyshot.jpg" width="1280" height="720" alt="KeyShot render of H-Dry from the side" loading="lazy"></div>
+            <figcaption><span class="mono">KeyShot</span>Side view, studio lighting.</figcaption>
+          </figure>
+          <figure class="span-6 pair rv"><div class="shot" style="aspect-ratio:16/9"><img src="img/hdry-assembly.jpg" width="1280" height="720" alt="Assembly animation frame with parts separating" loading="lazy"></div><figcaption><span class="mono">Assembly</span>Parts coming together.</figcaption></figure>
+          <figure class="span-6 pair rv"><div class="shot" style="aspect-ratio:16/9"><img src="img/hdry-side.jpg" width="1344" height="756" alt="H-Dry render from the other side" loading="lazy"></div><figcaption><span class="mono">View</span>Rear inlet side.</figcaption></figure>
+          <figure class="span-6 pair rv"><div class="shot" style="aspect-ratio:16/9"><img src="img/hdry-front.jpg" width="1152" height="648" alt="H-Dry front view showing the exhaust" loading="lazy"></div><figcaption><span class="mono">View</span>Front, exhaust.</figcaption></figure>
+          <figure class="span-6 pair rv"><div class="shot" style="aspect-ratio:16/9"><img src="img/hdry-back.jpg" width="1344" height="756" alt="H-Dry back view showing the perforated rear inlet" loading="lazy"></div><figcaption><span class="mono">View</span>Back, perforated inlet.</figcaption></figure>
+        </div>
+
+        <div class="grid" style="margin-top:clamp(48px,6vw,80px)">
+          <figure class="span-8 rv">
+            <div class="shot contain" style="aspect-ratio:1900/1344"><img src="img/hdry-drawing.jpg" width="1900" height="1344" alt="Exploded technical drawing of the hair dryer with numbered parts" loading="lazy"></div>
+            <figcaption><span class="mono">DWG</span>hair_dryer · sheet 1/1 · 18.06.2026</figcaption>
+          </figure>
+          <div class="span-4 rv">
+            <table class="parts">
+              <thead><tr><th>Item</th><th>Part</th><th>Material</th></tr></thead>
+              <tbody>
+                <tr><td>01</td><td>Heating element</td><td>–</td></tr>
+                <tr><td>02</td><td>Electric motor</td><td>Gray cast iron, ASTM A48 Gr. 40</td></tr>
+                <tr><td>03</td><td>Circuit board</td><td>–</td></tr>
+                <tr><td>05</td><td>Fan</td><td>–</td></tr>
+                <tr><td>06</td><td>Shell</td><td>–</td></tr>
+                <tr><td>07</td><td>Power button</td><td>LCP plastic</td></tr>
+                <tr><td>08</td><td>Cool button</td><td>LCP plastic</td></tr>
+                <tr><td>09</td><td>Rear inlet</td><td>LCP plastic</td></tr>
+                <tr><td>10</td><td>Exhaust</td><td>LCP plastic</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 03 MONACO -->
+  <section class="case" id="p-monaco">
+    <div class="wrap">
+      <div class="case-head rv">
+        <span class="num">03 / 05</span>
+        <div class="titles">
+          <h2>Circuit de Monaco Perfectionniste</h2>
+          <p class="sub">An award for the driver who sets a lap record at Monaco. The circuit itself becomes the trophy.</p>
+        </div>
+      </div>
+      <div class="tblock rv">
+        <div><span class="mono">Course</span><span class="v">Computer-Aided Design, midterm</span></div>
+        <div><span class="mono">Instructor</span><span class="v">Prof. Jieun Shim</span></div>
+        <div><span class="mono">Tools</span><span class="v">3D CAD, KeyShot 10</span></div>
+        <div><span class="mono">Output</span><span class="v">Renders, drawing at 1:1 · 2026</span></div>
+      </div>
+      <figure class="rv">
+        <div class="shot" style="aspect-ratio:1536/864"><img src="img/monaco-hero.jpg" width="1536" height="864" alt="Silver trophy shaped like the Monaco circuit with the words Precision and Speed" loading="lazy"></div>
+      </figure>
+      <div class="grid" style="margin-top:clamp(40px,5vw,64px)">
+        <div class="copy span-5 rv">
+          <h3>Precision and speed, in one line</h3>
+          <p>Monaco is one of the most unforgiving tracks in racing: almost no run-off, no margin for error, and precision held at constant speed for the whole race. The trophy follows the track outline, with <b>PRECISION</b> and <b>SPEED</b> worked into the corners where each one matters most.</p>
+          <p class="soft">Mirror-polished metal picks up the colours around it, so the trophy changes with the room it stands in.</p>
+        </div>
+        <div class="span-7">
+          <div class="grid" style="grid-template-columns:1fr 1fr">
+            <figure class="rv" style="grid-column:span 1 !important"><div class="shot" style="aspect-ratio:16/9"><img src="img/monaco-a.jpg" width="1333" height="749" alt="Trophy render in pink and cyan light" loading="lazy"></div></figure>
+            <figure class="rv" style="grid-column:span 1 !important"><div class="shot" style="aspect-ratio:16/9"><img src="img/monaco-b.jpg" width="1333" height="749" alt="Close-up of the Speed lettering" loading="lazy"></div></figure>
+            <figure class="rv" style="grid-column:span 1 !important"><div class="shot" style="aspect-ratio:16/9"><img src="img/monaco-c.jpg" width="1333" height="749" alt="Trophy side elevation" loading="lazy"></div></figure>
+            <figure class="rv" style="grid-column:span 1 !important"><div class="shot" style="aspect-ratio:16/9"><img src="img/monaco-d.jpg" width="1333" height="750" alt="Trophy end view" loading="lazy"></div></figure>
+          </div>
+        </div>
+        <figure class="span-12 rv" style="margin-top:clamp(20px,3vw,40px)">
+          <div class="shot contain" style="aspect-ratio:1772/1254;max-width:980px"><img src="img/monaco-drawing.jpg" width="1772" height="1254" alt="Technical drawing of the Monaco trophy with dimensions" loading="lazy"></div>
+          <figcaption><span class="mono">DWG</span>Monaco Circuit Perfectionist Award · scale 1:1 · 2026.05.03</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 SUMMER -->
+  <section class="case" id="p-summer">
+    <div class="wrap">
+      <div class="case-head rv">
+        <span class="num">04 / 05</span>
+        <div class="titles">
+          <h2>Summer 2025</h2>
+          <p class="sub">A booklet about one summer: flying home, music, friends, the taste of home, and the turn from August 31 to September 1.</p>
+        </div>
+      </div>
+      <div class="tblock rv">
+        <div><span class="mono">Type</span><span class="v">Visual diary, editorial</span></div>
+        <div><span class="mono">Format</span><span class="v">14 pages, A4, print-ready with bleed</span></div>
+        <div><span class="mono">Techniques</span><span class="v">Collage, cut-paper type, repetition</span></div>
+        <div><span class="mono">Year</span><span class="v">2025</span></div>
+      </div>
+    </div>
+    <div class="rail-wrap rv">
+      <div class="rail" id="rail" tabindex="0" aria-label="Booklet spreads, scroll sideways">
+        <figure><div class="shot"><img src="img/bk-cover.jpg" width="992" height="1408" alt="Booklet cover: Summer 2025 with an airplane and flag motifs" loading="lazy"></div><figcaption><span class="mono">Cover</span>Summer 2025</figcaption></figure>
+        <figure><div class="shot"><img src="img/bk-home.jpg" width="1800" height="1277" alt="Homecoming spread on notebook paper with cut-out letters" loading="lazy"></div><figcaption><span class="mono">pp. 2–3</span>Homecoming, June 18, 2025</figcaption></figure>
+        <figure><div class="shot"><img src="img/bk-memories.jpg" width="1800" height="1277" alt="Memories and friends spread with city road photos" loading="lazy"></div><figcaption><span class="mono">pp. 8–9</span>Memories and friends</figcaption></figure>
+        <figure><div class="shot"><img src="img/bk-live.jpg" width="1800" height="1277" alt="Spread reading I should live a little and enjoy the moment" loading="lazy"></div><figcaption><span class="mono">pp. 10–11</span>Live a little, enjoy the moment</figcaption></figure>
+        <figure><div class="shot"><img src="img/bk-hometown.jpg" width="1800" height="1277" alt="Spread with Kazakhstan chocolate wrapper and bar" loading="lazy"></div><figcaption><span class="mono">pp. 12–13</span>This is what hometown tastes like</figcaption></figure>
+        <figure><div class="shot"><img src="img/bk-september.jpg" width="992" height="1408" alt="Repeated typography August 31 fading into September 1" loading="lazy"></div><figcaption><span class="mono">p. 14</span>August 31 → September 1</figcaption></figure>
+      </div>
+      <div class="rail-ui">
+        <span class="mono soft">Drag or scroll</span>
+        <div class="rail-bar"><i id="railBar"></i></div>
+        <button class="round" id="railPrev" aria-label="Previous spread">←</button>
+        <button class="round" id="railNext" aria-label="Next spread">→</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 MOUNTAIN -->
+  <section class="case" id="p-mountain">
+    <div class="wrap">
+      <div class="case-head rv">
+        <span class="num">05 / 05</span>
+        <div class="titles">
+          <h2>Mountain</h2>
+          <p class="sub">The Wikipedia article on mountains, reset as a two-page A3 spread that you read by climbing it.</p>
+        </div>
+      </div>
+      <div class="tblock rv">
+        <div><span class="mono">Type</span><span class="v">Editorial information design</span></div>
+        <div><span class="mono">Source</span><span class="v">Wikipedia, “Mountain”</span></div>
+        <div><span class="mono">Format</span><span class="v">2 × A3, print</span></div>
+        <div><span class="mono">Structure</span><span class="v">8 sections, 16 references</span></div>
+      </div>
+      <figure class="rv">
+        <div class="shot contain" style="aspect-ratio:2200/1555"><img src="img/wiki-spread.jpg" width="2200" height="1555" alt="Two-page spread where text columns step upward like a mountain profile" loading="lazy"></div>
+        <figcaption><span class="mono">Spread</span>Columns rise in steps from 0 m to 3,000 m; click to view full size.</figcaption>
+      </figure>
+      <div class="grid" style="margin-top:clamp(36px,5vw,56px)">
+        <div class="copy span-6 rv">
+          <h3>The layout is the landform</h3>
+          <p>Each text column sits one step higher than the last, so the page itself becomes an elevation profile. Altitude markers run up the side, key figures are pulled out at the height where they belong, and a small diagram shows how vegetation changes from forest to bare rock and ice.</p>
+        </div>
+      </div>
+      <div class="stats rv">
+        <div><span class="big red">8,849 m</span><p>Height of Mount Everest, set at the top of the climb.</p></div>
+        <div><span class="big red">−6.5 °C</span><p>Average temperature drop for every 1,000 m climbed.</p></div>
+        <div><span class="big red">~24 %</span><p>Share of Earth’s land surface that is mountainous.</p></div>
+        <div><span class="big">0 → 3,000 m</span><p>Altitude scale the columns are set against.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="sec" id="about">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <span class="k mono">About</span>
+        <h2>Designer by training, engineer by habit.</h2>
+      </div>
+      <div class="about-grid">
+        <div class="about-lead rv">
+          <p class="big">I’m David, a third-year Industrial Design student at KAIST with a double major in Computer Science.</p>
+          <p>I work across 3D modeling, print layout, video and motion, and the web, and I build my own sites and apps. I’m looking for a UX/UI internship where product thinking and code meet.</p>
+          <p>Before KAIST I graduated as valedictorian (Altyn Belgi) from the National School of Physics and Maths in Almaty, and won first place in Kazakhstan’s national C++ competition.</p>
+          <div class="ctas" style="margin-top:30px">
+            <a class="btn line" href="https://www.linkedin.com/in/david-tsoy/" target="_blank" rel="noopener">LinkedIn <span class="arr">↗</span></a>
+            <a class="btn line" href="https://github.com/dav1dtsoy" target="_blank" rel="noopener">GitHub <span class="arr">↗</span></a>
+          </div>
+        </div>
+        <div class="cv">
+          <div class="rv">
+            <h3>Education</h3>
+            <ul>
+              <li><span class="y">2024–28</span><span>B.S. Industrial Design, KAIST<small>Double major in Computer Science. Design Studio I & II, CAD, Idea & Expression, Moving Image Design, Graphic Design, Data-Driven AI Service Design.</small></span></li>
+              <li><span class="y">2020–24</span><span>National School of Physics and Maths, Almaty<small>Altyn Belgi valedictorian, GPA 5.0 / 5.0</small></span></li>
+            </ul>
+          </div>
+          <div class="rv">
+            <h3>Recognition</h3>
+            <ul>
+              <li><span class="y">2023</span><span>1st place, start-up competition<small>Team AI medical app that suggested possible diagnoses from symptoms, built on verified data from licensed medical companies and national hospitals. Prize of 1,000,000 tenge.</small></span></li>
+              <li><span class="y">2023</span><span>1st place, national C++ coding competition<small>Republic of Kazakhstan. Prize of 300,000 tenge.</small></span></li>
+            </ul>
+          </div>
+          <div class="rv">
+            <h3>Also</h3>
+            <ul>
+              <li><span class="y">2026</span><span>Kinetic Clock<small>Design Studio I, Prof. E Roon Kang. A physical clock that tells time from an unusual perspective.</small></span></li>
+              <li><span class="y">2025</span><span>Head of Tennis, ASCEND Club</span></li>
+            </ul>
+          </div>
+          <div class="rv">
+            <h3>Tools</h3>
+            <div class="chip-group"><span class="y">Interface</span><div class="chips"><span>Figma</span><span>HTML</span><span>Canva</span></div></div>
+            <div class="chip-group"><span class="y">Adobe</span><div class="chips"><span>InDesign</span><span>Premiere Pro</span><span>After Effects</span></div></div>
+            <div class="chip-group"><span class="y">3D</span><div class="chips"><span>Rhino 7</span><span>Fusion 360</span><span>KeyShot 10</span></div></div>
+            <div class="chip-group"><span class="y">Code</span><div class="chips"><span>Python</span><span>C++</span><span>Vibecoding</span></div></div>
+          </div>
+          <div class="rv">
+            <h3>Languages</h3>
+            <ul>
+              <li><span class="y">RU</span><span>Russian, native</span></li>
+              <li><span class="y">EN</span><span>English, IELTS 7.5</span></li>
+              <li><span class="y">KO</span><span>Korean, KAIST Korean 3 & 4</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <div class="k mono rv">Let’s talk</div>
+      <a class="mail rv" href="mailto:davidtsoy@kaist.ac.kr">davidtsoy@kaist.ac.kr</a>
+      <div class="contact-row rv">
+        <button class="btn fill" id="copyMail">Copy email</button>
+        <a class="btn line" href="https://www.linkedin.com/in/david-tsoy/" target="_blank" rel="noopener">linkedin.com/in/david-tsoy <span class="arr">↗</span></a>
+        <a class="btn line" href="https://github.com/dav1dtsoy" target="_blank" rel="noopener">github.com/dav1dtsoy <span class="arr">↗</span></a>
+      </div>
+      <footer class="footer mono">
+        <span>© 2026 David Tsoy</span>
+        <span>Daejeon, South Korea</span>
+        <a href="#top" style="text-decoration:none">Back to top ↑</a>
+      </footer>
+    </div>
+  </section>
+</main>
+
+<div class="peek" id="peek" aria-hidden="true"></div>
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button class="round x" id="lbClose" aria-label="Close image">✕</button>
+  <div><img id="lbImg" alt=""><div class="cap" id="lbCap"></div></div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* split the name into letters for the staggered rise */
+  let i = 0;
+  document.querySelectorAll('[data-split]').forEach(row => {
+    const t = row.textContent; row.textContent = '';
+    [...t].forEach(c => { const s = document.createElement('span'); s.className = 'ch'; s.textContent = c; s.style.animationDelay = (0.25 + i++ * 0.06) + 's'; s.setAttribute('aria-hidden','true'); row.appendChild(s); });
+  });
+
+  /* nav: hide on scroll down, show on scroll up; progress line; active link */
+  const nav = document.getElementById('nav'), bar = document.getElementById('progress');
+  let lastY = scrollY;
+  const links = [...document.querySelectorAll('.nav a.l')];
+  const onScroll = () => {
+    const y = scrollY, h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${h > 0 ? y / h : 0})`;
+    nav.classList.toggle('solid', y > 30);
+    nav.classList.toggle('hide', y > lastY && y > 400);
+    lastY = y;
+    let cur = '';
+    ['work','about','contact'].forEach(id => { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top < innerHeight * .4) cur = id; });
+    if (document.getElementById('p-lamp').getBoundingClientRect().top < innerHeight*.4 && document.getElementById('about').getBoundingClientRect().top > innerHeight*.4) cur = 'work';
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+  };
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  /* reveal: only elements below the first screen are offset; they stay visible */
+  if (!reduce && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }), { rootMargin: '0px 0px -6% 0px' });
+    document.querySelectorAll('.rv').forEach(el => {
+      if (el.getBoundingClientRect().top > innerHeight) { el.classList.add('arm'); io.observe(el); }
+    });
+  }
+
+  /* hero web, drawn live; the pointer acts as the lamp's light */
+  const cv = document.getElementById('web'), box = document.getElementById('webBox'), glow = document.getElementById('webGlow');
+  const ctx = cv.getContext('2d');
+  let W = 0, H = 0, dpr = 1;
+  const N = 18, RINGS = 13;
+  const radials = [], rand = (s => () => (s = (s * 16807) % 2147483647) / 2147483647)(7);
+  for (let k = 0; k < N; k++) radials.push({ a: k / N * Math.PI * 2 + (rand() - .5) * .12, r: .9 + rand() * .1 });
+  const rings = [];
+  for (let j = 0; j < RINGS; j++) rings.push(.14 + j * (.82 / RINGS) + (rand() - .5) * .02);
+  const size = () => { const r = box.getBoundingClientRect(); dpr = Math.min(devicePixelRatio || 1, 2); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; };
+  size(); addEventListener('resize', size);
+
+  let light = { x: .62, y: .4 }, target = { x: .62, y: .4 }, hovering = false;
+  box.parentElement.addEventListener('pointermove', e => { const r = box.getBoundingClientRect(); target.x = (e.clientX - r.left) / r.width; target.y = (e.clientY - r.top) / r.height; hovering = true; });
+  box.parentElement.addEventListener('pointerleave', () => hovering = false);
+
+  const ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#1B1D1C';
+  const amber = getComputedStyle(document.documentElement).getPropertyValue('--glow').trim() || '#C98C3E';
+  const t0 = performance.now();
+  const ease = x => 1 - Math.pow(1 - Math.min(Math.max(x, 0), 1), 3);
+
+  function draw(now) {
+    const t = reduce ? 10 : (now - t0) / 1000;
+    if (!hovering) { target.x = .5 + Math.cos(t * .35) * .22; target.y = .5 + Math.sin(t * .5) * .2; }
+    light.x += (target.x - light.x) * .07; light.y += (target.y - light.y) * .07;
+    glow.style.transform = `translate(${(light.x - .5) * W}px, ${(light.y - .5) * H}px)`;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.save();
+    const R = Math.min(W, H) / 2 * .96;
+    ctx.translate(W / 2, H / 2);
+    ctx.rotate(reduce ? 0 : t * .03);
+    ctx.lineCap = 'round'; ctx.strokeStyle = ink;
+
+    // radial threads
+    ctx.globalAlpha = .55; ctx.lineWidth = 1;
+    radials.forEach((p, k) => {
+      const prog = ease((t - .15 - k * .035) / .9);
+      if (prog <= 0) return;
+      ctx.beginPath(); ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(p.a) * R * p.r * prog, Math.sin(p.a) * R * p.r * prog); ctx.stroke();
+    });
+    // spiral rings, sagging toward the centre between radials
+    ctx.globalAlpha = .42; ctx.lineWidth = .9;
+    rings.forEach((rr, j) => {
+      const prog = ease((t - 1 - j * .09) / .8);
+      if (prog <= 0) return;
+      const segs = Math.ceil(N * prog);
+      const breathe = 1 + Math.sin(t * .8 + j * .5) * .006;
+      ctx.beginPath();
+      for (let k = 0; k < segs; k++) {
+        const a = radials[k], b = radials[(k + 1) % N];
+        let a2 = b.a; if (a2 < a.a) a2 += Math.PI * 2;
+        const r1 = R * rr * breathe * Math.min(a.r, 1), r2 = R * rr * breathe * Math.min(b.r, 1);
+        const x1 = Math.cos(a.a) * r1, y1 = Math.sin(a.a) * r1, x2 = Math.cos(a2) * r2, y2 = Math.sin(a2) * r2;
+        const mid = (a.a + a2) / 2, sag = (r1 + r2) / 2 * .9;
+        if (k === 0) ctx.moveTo(x1, y1);
+        ctx.quadraticCurveTo(Math.cos(mid) * sag, Math.sin(mid) * sag, x2, y2);
+      }
+      ctx.stroke();
+    });
+    // hub
+    ctx.globalAlpha = .7; ctx.beginPath(); ctx.arc(0, 0, 2.2, 0, Math.PI * 2); ctx.fillStyle = ink; ctx.fill();
+    ctx.restore();
+
+    // light: tint the threads amber where the pointer shines
+    ctx.save(); ctx.globalCompositeOperation = 'source-atop';
+    const lx = light.x * W, ly = light.y * H, g = ctx.createRadialGradient(lx, ly, 0, lx, ly, Math.min(W, H) * .42);
+    g.addColorStop(0, amber); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.globalAlpha = .95; ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+
+    if (!reduce) requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+
+  /* work index: floating preview follows the cursor */
+  const peek = document.getElementById('peek');
+  const imgs = {};
+  document.querySelectorAll('.index a').forEach(a => {
+    const src = a.dataset.peek; const im = new Image(); im.src = src; im.alt = ''; peek.appendChild(im); imgs[src] = im;
+    a.addEventListener('pointerenter', () => { Object.values(imgs).forEach(x => x.classList.remove('cur')); imgs[src].classList.add('cur'); peek.classList.add('on'); });
+    a.addEventListener('pointerleave', () => peek.classList.remove('on'));
+  });
+  let px = innerWidth / 2, py = innerHeight / 2, cx = px, cy = py;
+  addEventListener('pointermove', e => { px = e.clientX; py = e.clientY; }, { passive: true });
+  (function follow() { cx += (px - cx) * .14; cy += (py - cy) * .14; peek.style.left = cx + 'px'; peek.style.top = cy + 'px'; peek.style.rotate = ((px - cx) * .04).toFixed(2) + 'deg'; requestAnimationFrame(follow); })();
+
+  /* booklet rail: drag, buttons, progress */
+  const rail = document.getElementById('rail'), rbar = document.getElementById('railBar');
+  const upd = () => { const max = rail.scrollWidth - rail.clientWidth; const w = rail.clientWidth / rail.scrollWidth; rbar.style.width = (w * 100) + '%'; rbar.style.transform = `translateX(${max > 0 ? rail.scrollLeft / max * (1 / w - 1) * 100 : 0}%)`; };
+  rail.addEventListener('scroll', upd, { passive: true }); addEventListener('resize', upd); setTimeout(upd, 300);
+  const step = d => { const f = rail.querySelector('figure'); rail.scrollBy({ left: d * (f.offsetWidth + 20), behavior: reduce ? 'auto' : 'smooth' }); };
+  document.getElementById('railPrev').onclick = () => step(-1);
+  document.getElementById('railNext').onclick = () => step(1);
+  rail.addEventListener('keydown', e => { if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1); });
+  let down = false, sx = 0, sl = 0, moved = 0;
+  rail.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; down = true; moved = 0; sx = e.clientX; sl = rail.scrollLeft; rail.classList.add('drag'); });
+  addEventListener('pointermove', e => { if (!down) return; const dx = e.clientX - sx; moved = Math.max(moved, Math.abs(dx)); rail.scrollLeft = sl - dx; });
+  addEventListener('pointerup', () => { if (!down) return; down = false; rail.classList.remove('drag'); });
+
+  /* lightbox */
+  const lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg'), lbCap = document.getElementById('lbCap');
+  let lastFocus = null;
+  const open = (img, cap) => { lastFocus = document.activeElement; lbImg.src = img.currentSrc || img.src; lbImg.alt = img.alt; lbCap.textContent = cap || img.alt; lb.classList.add('open'); document.getElementById('lbClose').focus(); };
+  const close = () => { lb.classList.remove('open'); if (lastFocus) lastFocus.focus(); };
+  document.querySelectorAll('.shot').forEach(s => {
+    const img = s.querySelector('img'); if (!img) return;
+    s.setAttribute('tabindex', '0'); s.setAttribute('role', 'button'); s.setAttribute('aria-label', 'Enlarge: ' + img.alt);
+    const fc = s.closest('figure')?.querySelector('figcaption');
+    const go = () => { if (moved > 6) return; open(img, fc ? fc.textContent.replace(/\s+/g, ' ').trim() : ''); };
+    s.addEventListener('click', go);
+    s.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); moved = 0; go(); } });
+  });
+  lb.addEventListener('click', e => { if (e.target !== lbImg) close(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && lb.classList.contains('open')) close(); });
+
+  /* copy email */
+  const toast = document.getElementById('toast');
+  const say = m => { toast.textContent = m; toast.classList.add('show'); clearTimeout(say.t); say.t = setTimeout(() => toast.classList.remove('show'), 2200); };
+  document.getElementById('copyMail').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText('davidtsoy@kaist.ac.kr'); say('Email copied'); }
+    catch { say('davidtsoy@kaist.ac.kr'); }
+  });
+})();
+</script>
+</body>
+</html>
