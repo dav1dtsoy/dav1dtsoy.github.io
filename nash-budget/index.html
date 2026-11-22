@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Наш бюджет</title>
+<meta name="theme-color" content="#17483d">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Наш бюджет">
+<style>
+:root{--green:#17483d;--mint:#e9f3ee;--bg:#f4f6f5;--ink:#17231f;--muted:#68756f;--line:#e1e8e4;--red:#b64242;--plus:#26734e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink)}
+header{background:var(--green);color:#fff;padding:22px max(18px,calc((100% - 1050px)/2))}
+header .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}h1{font-size:23px;margin:0}header p{margin:4px 0 0;color:#c9ded5;font-size:13px}
+.hright{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+main{max-width:1050px;margin:18px auto;padding:0 14px 40px}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:15px}
+.card,.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 2px 8px #1b392b08}
+.kicker{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}.big{font-size:25px;font-weight:750;margin-top:4px}.sub{color:var(--muted);font-size:12px}
+nav{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0}.tab,button{border:0;border-radius:10px;padding:10px 14px;background:#e7eee9;color:var(--green);font-weight:650;cursor:pointer;font-size:14px}
+.tab.active,button.primary{background:var(--green);color:#fff}.tab:hover,button:hover{filter:brightness(.97)}button.danger{background:#fff0f0;color:var(--red)}button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+button.small{padding:6px 10px;font-size:12px}button:disabled{opacity:.5;cursor:default}
+header button{background:#ffffff1f;color:#fff}header button:hover{background:#ffffff33}
+.panel{margin-bottom:14px}.panel h2{font-size:18px;margin:0 0 13px}.panel h3{font-size:15px;margin:18px 0 9px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:12px;font-weight:700;color:#506058}
+input,select,textarea{width:100%;padding:10px 11px;border:1px solid #d6e0da;border-radius:9px;background:#fff;color:var(--ink);font:inherit;font-size:16px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid #37856b55;border-color:#37856b}
+input[type=checkbox]{width:auto}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.person{border:1px solid var(--line);border-radius:9px;padding:8px 10px;display:flex;align-items:center;gap:8px;cursor:pointer}
+.person:has(input:checked){background:var(--mint);border-color:#b9d8c8}
+.item{border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0}.itemtop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.amount{font-weight:750;white-space:nowrap;text-align:right}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:9px 7px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-size:11px;text-transform:uppercase}td.n,th.n{text-align:right;white-space:nowrap}
+.pill{display:inline-block;background:var(--mint);color:var(--green);padding:3px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.off{background:#fde8d4;color:#8a4b10}.pill.local{background:#e8e8e8;color:#444}
+.bar{height:9px;background:#e9efeb;border-radius:99px;overflow:hidden}.bar span{display:block;height:100%;background:#37856b}
+.notice{background:#fff8e8;border:1px solid #f0dfb6;border-radius:11px;padding:11px;color:#71551e;font-size:13px}
+.notice.ok{background:#edf7f1;border-color:#c5e3d2;color:#1f5a40}
+.empty{color:var(--muted);padding:18px;text-align:center}.hidden{display:none!important}
+.bills{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.bill{flex:none;text-align:left;background:#f1f5f3;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:9px 12px;min-width:150px}
+.bill b{display:block;font-size:14px}.bill span{font-size:12px;color:var(--muted)}.bill.active{background:var(--green);color:#fff;border-color:var(--green)}.bill.active span{color:#c9ded5}
+.bill.new{background:#fff;border:1px dashed #9fbfb0;color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:700}
+.tot{display:grid;grid-template-columns:1fr auto;gap:4px 16px;margin-top:10px;font-size:14px}.tot .grand{font-weight:800;font-size:17px;padding-top:6px;border-top:1px solid var(--line)}
+details.hist{border:1px solid var(--line);border-radius:12px;margin:8px 0;padding:0}details.hist>summary{list-style:none;cursor:pointer;padding:12px}details.hist>summary::-webkit-details-marker{display:none}
+details.hist .body{padding:0 12px 12px}.chev{display:inline-block;transition:transform .15s;color:var(--muted)}details[open] .chev{transform:rotate(90deg)}
+.linkbox{display:flex;gap:8px}.linkbox input{font-size:13px}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;margin:6px 0}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#17231f;color:#fff;padding:11px 16px;border-radius:11px;font-size:14px;z-index:50;max-width:90vw;box-shadow:0 6px 20px #0003}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:12px}
+.plus{color:var(--plus)}.minus{color:var(--red)}
+@media(max-width:650px){.summary{grid-template-columns:1fr 1fr}.summary .card:first-child{grid-column:span 2}.grid,.grid3{grid-template-columns:1fr}header{padding:18px}.big{font-size:21px}table{font-size:12px}.tab{padding:9px 11px;font-size:13px}}
+</style>
+</head>
+<body>
+
+<!-- ============ СТАРТОВЫЙ ЭКРАН ============ -->
+<div id="landing" class="hidden">
+<header><div class="top"><div><h1>НАШ БЮДЖЕТ</h1><p>Общие расходы с друзьями · ресторанные счета · кто кому должен</p></div><span id="landingStatus" class="pill"></span></div></header>
+<main>
+<div id="landingError" class="notice hidden" style="margin-bottom:14px"></div>
+<div class="panel"><h2>Создать новую группу</h2>
+<p class="sub">Группа — это поездка или компания друзей. После создания вы получите ссылку: отправьте её друзьям, и все будут вести расходы вместе.</p>
+<div class="grid">
+<div class="field"><label>Название группы</label><input id="newGroupName" placeholder="Например, Поездка в Алматы"></div>
+<div class="field"><label>Участники — по одному имени в строке</label><textarea id="newMembers" rows="6">Галина
+</textarea></div>
+</div>
+<div class="actions"><button class="primary" id="createBtn" onclick="createGroup()">Создать группу</button></div>
+</div>
+<div class="panel"><h2>Уже есть группа?</h2>
+<div id="recentGroups"></div>
+<div class="field" style="margin-top:10px"><label>Вставьте ссылку или код группы</label><div class="linkbox"><input id="joinCode" placeholder="https://…?g=abc123 или abc123"><button onclick="joinGroup()">Открыть</button></div></div>
+</div>
+</main>
+</div>
+
+<!-- ============ ПРИЛОЖЕНИЕ ============ -->
+<div id="app" class="hidden">
+<header><div class="top"><div><h1 id="groupTitle">Наш бюджет</h1><p>Совместные расходы · ресторанные счета · расчёты</p></div>
+<div class="hright"><span id="syncStatus" class="pill">Подключение…</span><button onclick="copyLink()">Пригласить друзей</button><button onclick="goHome()" title="Все группы">⌂</button></div></div></header>
+<main>
+<div id="loading" class="empty">Загружаем данные группы…</div>
+<div id="content" class="hidden">
+<section class="summary">
+ <div class="card"><div class="kicker">Всего расходов · в тенге</div><div class="big" id="total">0 ₸</div><div class="sub" id="expenseCount">0 операций</div></div>
+ <div class="card"><div class="kicker">Участники</div><div class="big" id="memberCount">0</div><div class="sub">Добавить — во вкладке «Участники»</div></div>
+ <div class="card"><div class="kicker">Открытые расчёты</div><div class="big" id="transferCount">0</div><div class="sub">Рекомендуемых переводов</div></div>
+</section>
+<nav>
+<button class="tab active" data-tab="add">＋ Расход</button><button class="tab" data-tab="restaurant">🍽 Ресторан</button><button class="tab" data-tab="history">История</button><button class="tab" data-tab="settle">Кто кому должен</button><button class="tab" data-tab="reports">Отчёты</button><button class="tab" data-tab="settings">Участники и данные</button>
+</nav>
+
+<section id="add" class="view">
+<div class="panel"><h2>Добавить обычный расход</h2>
+<div class="grid">
+ <div class="field"><label>Название расхода</label><input id="expName" placeholder="Например, продукты, такси, отель"></div>
+ <div class="field"><label>Категория</label><select id="expCategory"><option>Жильё</option><option>Питание</option><option>Транспорт</option><option>Развлечения</option><option>Покупки</option><option>Аптека</option><option>Другое</option></select></div>
+ <div class="field"><label>Сумма</label><input id="expAmount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"></div>
+ <div class="field"><label>Валюта</label><select id="expCurrency" class="currency" data-rate="expRate"></select></div>
+ <div class="field"><label>Курс к тенге (1 единица валюты)</label><input id="expRate" type="number" min="0.000001" step="any" value="1" inputmode="decimal"></div>
+ <div class="field"><label>Кто оплатил</label><select id="expPayer" class="memberSelect"></select></div>
+ <div class="field"><label>Дата</label><input id="expDate" type="date"></div>
+</div>
+<h3>На кого распределить?</h3><div class="row" style="margin-bottom:8px"><button class="ghost small" onclick="selectAll('expPeople',true)">Все</button><button class="ghost small" onclick="selectAll('expPeople',false)">Снять выбор</button></div><div id="expPeople" class="people" data-default="all"></div>
+<div class="actions"><button class="primary" onclick="addRegular()">Добавить расход</button></div>
+</div>
+</section>
+
+<section id="restaurant" class="view hidden">
+<div class="panel"><div class="row between"><h2 style="margin:0">Ресторанные счета</h2><span class="sub">Каждый поход в ресторан — отдельный счёт</span></div>
+<div class="bills" id="billChips" style="margin-top:12px"></div>
+<div id="newBillForm" class="hidden" style="margin-top:14px">
+<h3 style="margin-top:0">Новый счёт</h3>
+<div class="grid">
+ <div class="field"><label>Ресторан / название</label><input id="nbName" placeholder="Например, Кафе «Дастархан»"></div>
+ <div class="field"><label>Дата</label><input id="nbDate" type="date"></div>
+ <div class="field"><label>Кто оплатил счёт</label><select id="nbPayer" class="memberSelect"></select></div>
+ <div class="field"><label>Валюта счёта</label><select id="nbCurrency" class="currency" data-rate="nbRate"></select></div>
+ <div class="field"><label>Курс к тенге</label><input id="nbRate" type="number" min="0.000001" step="any" value="1" inputmode="decimal"></div>
+</div>
+<div class="actions"><button class="primary" onclick="createBill()">Создать счёт</button><button class="ghost" onclick="toggleNewBill(false)">Отмена</button></div>
+</div>
+</div>
+
+<div id="noBill" class="panel empty">Пока нет ни одного счёта. Нажмите «＋ Новый счёт», чтобы начать.</div>
+
+<div id="billArea" class="hidden">
+<div class="panel">
+ <div class="itemtop"><div><h2 id="billTitle" style="margin:0"></h2><div class="sub" id="billMeta"></div></div><div class="row"><button class="ghost small" onclick="toggleEditBill()">Изменить</button><button class="danger small" onclick="deleteBill()">Удалить счёт</button></div></div>
+ <div id="editBillForm" class="hidden" style="margin-top:12px">
+ <div class="grid">
+  <div class="field"><label>Название</label><input id="ebName"></div>
+  <div class="field"><label>Дата</label><input id="ebDate" type="date"></div>
+  <div class="field"><label>Кто оплатил</label><select id="ebPayer" class="memberSelect"></select></div>
+  <div class="field"><label>Валюта</label><select id="ebCurrency" class="currency" data-rate="ebRate"></select></div>
+  <div class="field"><label>Курс к тенге</label><input id="ebRate" type="number" min="0.000001" step="any" inputmode="decimal"></div>
+ </div>
+ <div class="actions"><button class="primary" onclick="saveBill()">Сохранить</button><button class="ghost" onclick="toggleEditBill(false)">Отмена</button></div>
+ </div>
+ <div id="billItems" style="margin-top:10px"></div>
+ <div class="tot" id="billTotals"></div>
+ <h3>Кто сколько должен за этот счёт</h3>
+ <div id="billShares"></div>
+</div>
+
+<div class="panel"><h2>Добавить позицию в счёт</h2>
+<div class="grid3">
+ <div class="field" style="grid-column:span 1"><label>Блюдо / напиток</label><input id="dishName" placeholder="Стейк, салат, кофе…"></div>
+ <div class="field"><label>Количество</label><input id="dishQty" type="number" min="1" step="1" value="1" inputmode="numeric"></div>
+ <div class="field"><label>Цена за единицу</label><input id="dishPrice" type="number" min="0" step="0.01" placeholder="0" inputmode="decimal"></div>
+</div>
+<h3>Кто заказал / делит позицию?</h3><div class="row" style="margin-bottom:8px"><button class="ghost small" onclick="selectAll('dishPeople',true)">Все</button><button class="ghost small" onclick="selectAll('dishPeople',false)">Снять выбор</button></div><div id="dishPeople" class="people" data-default="none"></div>
+<div class="sub" id="dishPreview" style="margin-top:8px">Итого по позиции: —</div>
+<div class="actions"><button class="primary" onclick="addDish()">Добавить позицию</button></div>
+</div>
+
+<div class="panel"><h2>Сервисный сбор, чаевые и скидка</h2>
+<div class="grid">
+ <div class="field"><label>Сервисный сбор / чаевые (в валюте счёта)</label><input id="serviceAmount" type="number" min="0" step=".01" placeholder="Сумма" inputmode="decimal"></div>
+ <div class="field"><label>Как распределить</label><select id="serviceMode"><option value="proportional">Пропорционально заказам</option><option value="equal">Поровну между выбранными</option></select></div>
+</div>
+<div class="row" style="margin:10px 0 8px"><button class="ghost small" onclick="selectAll('servicePeople',true)">Все</button><button class="ghost small" onclick="selectAll('servicePeople',false)">Снять выбор</button></div><div id="servicePeople" class="people" data-default="all"></div>
+<div class="actions"><button onclick="addService()">Добавить сбор / чаевые</button></div>
+<h3>Скидка на счёт</h3>
+<div class="grid"><div class="field"><label>Сумма скидки (в валюте счёта)</label><input id="discountAmount" type="number" min="0" step=".01" placeholder="Сумма" inputmode="decimal"></div><div class="field"><label>Как распределить</label><select id="discountMode"><option value="proportional">Пропорционально заказам</option><option value="equal">Поровну между теми, кто заказывал</option></select></div></div>
+<div class="actions"><button onclick="addDiscount()">Учесть скидку</button></div>
+</div>
+
+<div class="panel"><h2>Фотография чека и распознавание</h2>
+<div class="field"><label>Загрузить фото чека</label><input id="receiptFile" type="file" accept="image/*"></div>
+<div id="ocrStatus" class="sub" style="margin-top:8px">Загрузите фото, распознайте текст и перенесите строки в позиции после проверки.</div>
+<img id="receiptPreview" class="hidden" alt="Фото чека" style="max-width:100%;max-height:260px;object-fit:contain;margin-top:10px;border-radius:10px">
+<div class="actions"><button id="ocrButton" onclick="runOCR()">Распознать текст чека</button></div>
+<textarea id="ocrText" rows="6" placeholder="Распознанный текст появится здесь." style="margin-top:10px"></textarea>
+<div class="sub">Распознавание работает через Tesseract.js. Всегда сверяйте результат с чеком.</div>
+</div>
+</div>
+</section>
+
+<section id="history" class="view hidden"><div class="panel"><div class="row between"><h2 style="margin:0">История расходов</h2><select id="historyFilter" style="max-width:200px" onchange="renderHistory()"><option value="all">Все операции</option><option value="regular">Обычные расходы</option><option value="restaurant">Ресторанные счета</option><option value="transfer">Переводы долгов</option></select></div><div id="historyList" style="margin-top:10px"></div></div></section>
+
+<section id="settle" class="view hidden"><div class="panel"><h2>Баланс участников</h2><p class="sub">Плюс — участнику должны вернуть деньги. Минус — ему нужно перевести деньги группе.</p><div id="balances"></div><h3>Оптимальные переводы</h3><p class="sub">Когда перевод сделан, нажмите «Перевёл» — он запишется в историю, и баланс обновится у всех.</p><div id="transfers"></div></div></section>
+
+<section id="reports" class="view hidden"><div class="panel"><h2>Отчёты и аналитика</h2><div class="summary" style="margin-top:10px"><div class="card"><div class="kicker">Всего</div><div class="big" id="reportTotal">0 ₸</div></div><div class="card"><div class="kicker">Операций</div><div class="big" id="reportOps">0</div></div><div class="card"><div class="kicker">Среднее на человека</div><div class="big" id="reportAverage">0 ₸</div></div></div><h3>По категориям</h3><div id="categoryReport"></div><h3>По участникам</h3><div id="payerReport"></div></div></section>
+
+<section id="settings" class="view hidden">
+<div class="panel"><h2>Пригласить друзей</h2><p class="sub">Отправьте эту ссылку друзьям. Все, у кого она есть, видят и редактируют расходы группы — изменения появляются у всех сразу.</p>
+<div class="linkbox"><input id="shareLink" readonly onclick="this.select()"><button class="primary" onclick="copyLink()">Копировать</button></div>
+<div id="syncNotice" class="notice" style="margin-top:12px"></div></div>
+<div class="panel"><h2>Участники</h2><p class="sub">Можно добавить сколько угодно участников. Переименование меняет имя во всех записях. Удалить можно только того, кто ещё не участвует ни в одном расходе.</p>
+<div id="memberList"></div>
+<div class="linkbox" style="margin-top:12px"><input id="newMemberName" placeholder="Имя нового участника" onkeydown="if(event.key==='Enter')addMember()"><button class="primary" onclick="addMember()">Добавить</button></div>
+<h3>Это я</h3><p class="sub">Выберите себя — вы будете подставляться как плательщик по умолчанию на этом устройстве.</p>
+<select id="meSelect" style="max-width:280px" onchange="setMe(this.value)"></select>
+</div>
+<div class="panel"><h2>Название группы</h2><div class="linkbox"><input id="groupNameInput"><button onclick="saveGroupName()">Сохранить</button></div></div>
+<div class="panel"><h2>Резервная копия и перенос данных</h2><p class="sub">Импорт добавляет данные из файла в эту группу — подходит и для резервной копии из старой версии «Наш бюджет — 7». Участники сопоставляются по имени.</p><div class="actions"><button onclick="exportJSON()">Скачать резервную копию JSON</button><button onclick="exportCSV()">Экспортировать в CSV</button><label class="tab" style="display:inline-flex;align-items:center;gap:6px">Импортировать JSON<input type="file" accept=".json,application/json" style="display:none" onchange="importJSON(event)"></label></div><div class="actions"><button class="danger" onclick="clearAll()">Удалить все расходы и счета</button></div></div>
+</section>
+</div>
+<footer>Наш бюджет · расчёты ведутся в тенге по сохранённому курсу каждой операции</footer>
+</main>
+</div>
+<div id="toast" class="hidden"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
+<script src="config.js"></script>
+<script>
+const FB_VER='10.12.2';
+const CFG=window.FIREBASE_CONFIG||null;
+const CURRENCIES=[['KZT','₸'],['USD','$'],['EUR','€'],['RUB','₽'],['KRW','₩'],['CNY','¥'],['TRY','₺'],['AED','AED'],['THB','฿'],['UZS','сум'],['KGS','сом'],['GEL','₾']];
+const SYM=Object.fromEntries(CURRENCIES);
+const $=id=>document.getElementById(id);
+let S=emptyState(),store=null,gid=null,activeBill=null,firstLoad=true;
+
+function emptyState(){return {meta:{},members:{},expenses:{},bills:{},items:{}}}
+function norm(v){v=v||{};return {meta:v.meta||{},members:v.members||{},expenses:v.expenses||{},bills:v.bills||{},items:v.items||{}}}
+function arr(x){return Array.isArray(x)?x.filter(v=>v!=null):Object.values(x||{})}
+function rid(n){const a='abcdefghijkmnpqrstuvwxyz23456789',r=crypto.getRandomValues(new Uint8Array(n));return [...r].map(b=>a[b%a.length]).join('')}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function num(n){return (Math.round((n||0)*100)/100).toLocaleString('ru-RU',{maximumFractionDigits:2})}
+function fmt(n){return num(n)+' ₸'}
+function fmtc(n,c){return num(n)+' '+(SYM[c]||c)}
+function today(){const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)}
+function fdate(s){if(!s)return '';const d=new Date(s.length===10?s+'T12:00':s);return d.toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'})}
+function lsGet(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+let toastT;function toast(t){const el=$('toast');el.textContent=t;el.classList.remove('hidden');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.add('hidden'),3200)}
+
+/* ---------- хранилище: облако (Firebase) или это устройство ---------- */
+function localStore(id){
+ const key='nb-group-'+id,read=()=>norm(lsGet(key,null));
+ const write=()=>lsSet(key,S);
+ const setPath=(path,val)=>{const p=path.split('/');let o=S;for(let i=0;i<p.length-1;i++)o=o[p[i]]=o[p[i]]||{};if(val===null)delete o[p.at(-1)];else o[p.at(-1)]=JSON.parse(JSON.stringify(val))};
+ return {kind:'local',
+  start(cb){S=read();setStatus('local');cb();addEventListener('storage',e=>{if(e.key===key){S=read();cb()}})},
+  async set(path,val){setPath(path,val);write();renderAll()},
+  async update(obj){Object.entries(obj).forEach(([p,v])=>setPath(p,v));write();renderAll()},
+  async init(data){lsSet(key,data)}};
+}
+let fb=null;
+async function loadFirebase(){if(fb)return fb;const [a,d]=await Promise.all([import(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-app.js`),import(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-database.js`)]);const app=a.initializeApp(CFG);fb={d,db:d.getDatabase(app)};return fb}
+async function cloudStore(id){
+ const {d,db}=await loadFirebase(),base='groups/'+id,r=p=>d.ref(db,p?base+'/'+p:base);
+ return {kind:'cloud',
+  start(cb,onErr){d.onValue(r(),s=>{S=norm(s.val());cb()},onErr);d.onValue(d.ref(db,'.info/connected'),s=>setStatus(s.val()?'online':'offline'))},
+  set(path,val){return d.set(r(path),val)},
+  update(obj){return d.update(r(),obj)},
+  init(data){return d.set(r(),data)}};
+}
+function makeStore(id){return CFG?cloudStore(id):Promise.resolve(localStore(id))}
+function put(path,val){return Promise.resolve(store.set(path,val)).catch(e=>toast('Не удалось сохранить: '+e.message))}
+function putMany(obj){return Promise.resolve(store.update(obj)).catch(e=>toast('Не удалось сохранить: '+e.message))}
+function setStatus(s){const el=$('syncStatus');el.className='pill'+(s==='offline'?' off':s==='local'?' local':'');el.textContent=s==='online'?'● Синхронизировано':s==='offline'?'Нет связи · сохранится позже':'Только это устройство'}
+
+/* ---------- запуск ---------- */
+function parseGid(s){s=String(s||'').trim();const m=s.match(/[?&]g=([a-z0-9]+)/i);return m?m[1]:(/^[a-z0-9]{6,}$/i.test(s)?s:null)}
+async function boot(){
+ initStatic();
+ gid=parseGid(location.search);
+ if(!gid)return showLanding();
+ $('app').classList.remove('hidden');
+ try{store=await makeStore(gid)}catch(e){return showLanding('Не удалось подключиться к серверу синхронизации. Проверьте интернет и обновите страницу.')}
+ const timer=setTimeout(()=>{if(firstLoad)$('loading').textContent='Загрузка идёт дольше обычного… Проверьте подключение к интернету.'},10000);
+ store.start(()=>{
+  if(firstLoad){firstLoad=false;clearTimeout(timer);
+   if(!Object.keys(S.members).length&&!S.meta.name){forgetGroup(gid);return showLanding('Группа не найдена. Возможно, ссылка неполная или группа была удалена.')}
+   $('loading').classList.add('hidden');$('content').classList.remove('hidden');
+   activeBill=lsGet('nb-bill-'+gid,null)}
+  rememberGroup();renderAll();
+ },err=>{clearTimeout(timer);$('loading').textContent='Ошибка доступа к данным: '+err.message});
+}
+function showLanding(err){
+ $('app').classList.add('hidden');$('landing').classList.remove('hidden');
+ $('landingStatus').textContent=CFG?'Синхронизация включена':'Без синхронизации';
+ if(err){$('landingError').textContent=err;$('landingError').classList.remove('hidden')}
+ const rec=lsGet('nb-recent',[]);
+ $('recentGroups').innerHTML=rec.length?'<div class="sub" style="margin-bottom:6px">Недавние группы на этом устройстве:</div>'+rec.map(g=>`<div class="item itemtop"><div><strong>${esc(g.name)}</strong><div class="sub">${esc(g.members||'')}</div></div><a href="?g=${esc(g.id)}"><button class="small">Открыть</button></a></div>`).join(''):'<div class="sub">Попросите у друзей ссылку на группу.</div>';
+}
+function rememberGroup(){let rec=lsGet('nb-recent',[]).filter(g=>g.id!==gid);rec.unshift({id:gid,name:S.meta.name||'Группа',members:memberList().map(m=>m.name).join(', ')});lsSet('nb-recent',rec.slice(0,12))}
+function forgetGroup(id){lsSet('nb-recent',lsGet('nb-recent',[]).filter(g=>g.id!==id))}
+function goHome(){location.href=location.pathname}
+function joinGroup(){const g=parseGid($('joinCode').value);if(!g)return toast('Не похоже на ссылку или код группы');location.href=location.pathname+'?g='+g}
+async function createGroup(){
+ const name=$('newGroupName').value.trim()||'Наша группа';
+ const names=$('newMembers').value.split('\n').map(s=>s.trim()).filter(Boolean);
+ if(names.length<2)return toast('Добавьте хотя бы двух участников');
+ if(new Set(names.map(n=>n.toLowerCase())).size!==names.length)return toast('Имена участников должны быть разными');
+ $('createBtn').disabled=true;
+ try{const id=rid(12),data={meta:{name,created:Date.now()},members:{}};names.forEach((n,i)=>data.members[rid(8)]={name:n,order:i});
+  const st=await makeStore(id);await st.init(data);location.href=location.pathname+'?g='+id}
+ catch(e){$('createBtn').disabled=false;toast('Не удалось создать группу: '+e.message)}
+}
+function shareUrl(){return location.origin+location.pathname+'?g='+gid}
+async function copyLink(){try{await navigator.clipboard.writeText(shareUrl());toast('Ссылка скопирована — отправьте её друзьям')}catch(e){$('shareLink').select();toast('Скопируйте ссылку вручную')}}
+
+/* ---------- участники ---------- */
+function memberList(){return Object.entries(S.members).map(([id,m])=>({id,...m})).sort((a,b)=>(a.order||0)-(b.order||0)||a.name.localeCompare(b.name))}
+function mname(id){return S.members[id]?.name||'Удалённый участник'}
+function names(ids){return arr(ids).map(mname).map(esc).join(', ')}
+function memberUsed(id){return Object.values(S.expenses).some(e=>e.payer===id||arr(e.owners).includes(id))||Object.values(S.bills).some(b=>b.payer===id)||Object.values(S.items).some(i=>arr(i.owners).includes(id))}
+function addMember(){const n=$('newMemberName').value.trim();if(!n)return;if(memberList().some(m=>m.name.toLowerCase()===n.toLowerCase()))return toast('Такой участник уже есть');const order=Math.max(0,...memberList().map(m=>m.order||0))+1;put('members/'+rid(8),{name:n,order});$('newMemberName').value='';toast(n+' добавлен(а)')}
+function renameMember(id){const inp=document.querySelector(`[data-mid="${id}"]`),n=inp.value.trim();if(!n)return toast('Имя не может быть пустым');if(memberList().some(m=>m.id!==id&&m.name.toLowerCase()===n.toLowerCase()))return toast('Такое имя уже есть');put('members/'+id+'/name',n);toast('Имя сохранено')}
+function removeMember(id){if(memberUsed(id))return toast('Нельзя удалить: участник есть в расходах или счетах');if(memberList().length<=2)return toast('В группе должно остаться хотя бы двое');if(confirm('Удалить участника «'+mname(id)+'»?'))put('members/'+id,null)}
+function setMe(id){lsSet('nb-me-'+gid,id||null);renderSelects(true)}
+function me(){const id=lsGet('nb-me-'+gid,null);return S.members[id]?id:null}
+
+/* ---------- расчёты ---------- */
+function split(v,owners,weights){const out={};if(!owners.length)return out;let s=0;if(weights)owners.forEach(o=>s+=weights[o]||0);owners.forEach(o=>out[o]=weights&&s>0?v*(weights[o]||0)/s:v/owners.length);return out}
+function itemsOf(bid){return Object.entries(S.items).filter(([,i])=>i.billId===bid).map(([id,i])=>({id,...i})).sort((a,b)=>(a.created||0)-(b.created||0))}
+function billCalc(bid){
+ const its=itemsOf(bid),w={},share={};let sub=0,service=0,discount=0;
+ its.filter(i=>i.kind==='dish').forEach(i=>{const v=i.qty*i.price,o=arr(i.owners);sub+=v;o.forEach(m=>{w[m]=(w[m]||0)+v/o.length;share[m]=(share[m]||0)+v/o.length})});
+ const eaters=Object.keys(w).filter(m=>w[m]>0);
+ its.filter(i=>i.kind!=='dish').forEach(i=>{const isD=i.kind==='discount';if(isD)discount+=i.amount;else service+=i.amount;
+  let o=isD?eaters:arr(i.owners);if(!o.length)o=memberList().map(m=>m.id);
+  Object.entries(split(isD?-i.amount:i.amount,o,i.mode==='proportional'?w:null)).forEach(([m,x])=>share[m]=(share[m]||0)+x)});
+ return {items:its,sub,service,discount,total:sub+service-discount,share};
+}
+function calc(){
+ const bal={},paid={},cons={},cats={};let total=0,ops=0;const add=(o,k,v)=>o[k]=(o[k]||0)+v;
+ memberList().forEach(m=>{bal[m.id]=0;paid[m.id]=0;cons[m.id]=0});
+ Object.values(S.expenses).forEach(e=>{const v=e.amount*e.rate,sh=split(v,arr(e.owners),e.weights);add(bal,e.payer,v);Object.entries(sh).forEach(([m,x])=>add(bal,m,-x));
+  if(e.transfer)return;ops++;total+=v;add(cats,e.category,v);add(paid,e.payer,v);Object.entries(sh).forEach(([m,x])=>add(cons,m,x))});
+ Object.entries(S.bills).forEach(([id,b])=>{const c=billCalc(id),r=b.rate||1,v=c.total*r;ops++;total+=v;add(cats,'Ресторан',v);add(paid,b.payer,v);add(bal,b.payer,v);Object.entries(c.share).forEach(([m,x])=>{add(cons,m,x*r);add(bal,m,-x*r)})});
+ return {bal,paid,cons,cats,total,ops};
+}
+function settle(bal){
+ const ids=Object.keys(bal),debt=ids.filter(n=>bal[n]<-.5).map(n=>({n,v:-bal[n]})).sort((a,b)=>b.v-a.v),credit=ids.filter(n=>bal[n]>.5).map(n=>({n,v:bal[n]})).sort((a,b)=>b.v-a.v),out=[];let i=0,j=0;
+ while(i<debt.length&&j<credit.length){const v=Math.min(debt[i].v,credit[j].v);out.push({from:debt[i].n,to:credit[j].n,v});debt[i].v-=v;credit[j].v-=v;if(debt[i].v<.5)i++;if(credit[j].v<.5)j++}
+ return out;
+}
+
+/* ---------- формы ---------- */
+function selected(id){return [...document.querySelectorAll('#'+id+' input:checked')].map(x=>x.value)}
+function selectAll(id,on){document.querySelectorAll('#'+id+' input').forEach(x=>x.checked=on)}
+function readNum(id){const v=parseFloat(String($(id).value).replace(',','.'));return isFinite(v)?v:0}
+function addRegular(){
+ const name=$('expName').value.trim(),amount=readNum('expAmount'),rate=readNum('expRate'),owners=selected('expPeople');
+ if(!name||amount<=0||rate<=0||!owners.length||!$('expPayer').value)return toast('Заполните название, сумму, курс и выберите участников');
+ put('expenses/'+rid(12),{name,category:$('expCategory').value,amount,currency:$('expCurrency').value,rate,payer:$('expPayer').value,owners,date:$('expDate').value||today(),created:Date.now()});
+ $('expName').value='';$('expAmount').value='';toast('Расход добавлен');
+}
+function removeExpense(id){if(confirm('Удалить эту операцию?'))put('expenses/'+id,null)}
+function toggleNewBill(on){$('newBillForm').classList.toggle('hidden',!on);if(on){$('nbDate').value=today();$('nbName').focus()}}
+function createBill(){
+ const name=$('nbName').value.trim()||'Ресторан',rate=readNum('nbRate');if(rate<=0)return toast('Укажите курс');if(!$('nbPayer').value)return toast('Выберите, кто оплатил');
+ const id=rid(12);put('bills/'+id,{name,date:$('nbDate').value||today(),payer:$('nbPayer').value,currency:$('nbCurrency').value,rate,created:Date.now()});
+ setActiveBill(id);$('nbName').value='';toggleNewBill(false);selectAll('dishPeople',false);toast('Счёт создан — добавляйте блюда');
+}
+function setActiveBill(id){activeBill=id;lsSet('nb-bill-'+gid,id);toggleEditBill(false);renderBills()}
+function curBill(){return activeBill&&S.bills[activeBill]?activeBill:null}
+function toggleEditBill(on){const f=$('editBillForm');if(on===undefined)on=f.classList.contains('hidden');f.classList.toggle('hidden',!on);if(on){const b=S.bills[curBill()];if(!b)return;$('ebName').value=b.name;$('ebDate').value=b.date;$('ebPayer').value=b.payer;$('ebCurrency').value=b.currency;$('ebRate').value=b.rate}}
+function saveBill(){const id=curBill();if(!id)return;const rate=readNum('ebRate');if(rate<=0)return toast('Укажите курс');put('bills/'+id,{...S.bills[id],name:$('ebName').value.trim()||'Ресторан',date:$('ebDate').value||today(),payer:$('ebPayer').value,currency:$('ebCurrency').value,rate});toggleEditBill(false);toast('Счёт обновлён')}
+function deleteBill(){const id=curBill();if(!id||!confirm('Удалить счёт «'+S.bills[id].name+'» со всеми позициями?'))return;const up={['bills/'+id]:null};itemsOf(id).forEach(i=>up['items/'+i.id]=null);activeBill=null;putMany(up)}
+function needBill(){const id=curBill();if(!id)toast('Сначала создайте или выберите счёт');return id}
+function addDish(){
+ const id=needBill();if(!id)return;const name=$('dishName').value.trim(),qty=readNum('dishQty'),price=readNum('dishPrice'),owners=selected('dishPeople');
+ if(!name||qty<=0||price<=0||!owners.length)return toast('Проверьте блюдо, количество, цену и выберите, кто заказал');
+ put('items/'+rid(12),{billId:id,kind:'dish',name,qty,price,owners,created:Date.now()});
+ $('dishName').value='';$('dishPrice').value='';$('dishQty').value=1;updateDishPreview();$('dishName').focus();
+}
+function addService(){const id=needBill();if(!id)return;const amount=readNum('serviceAmount'),owners=selected('servicePeople');if(amount<=0||!owners.length)return toast('Введите сумму и выберите участников');const mode=$('serviceMode').value;
+ put('items/'+rid(12),{billId:id,kind:'service',name:mode==='proportional'?'Сервис / чаевые (пропорционально)':'Сервис / чаевые (поровну)',amount,mode,owners,created:Date.now()});$('serviceAmount').value=''}
+function addDiscount(){const id=needBill();if(!id)return;const amount=readNum('discountAmount');if(amount<=0)return toast('Введите сумму скидки');if(!itemsOf(id).some(i=>i.kind==='dish'))return toast('Сначала добавьте блюда в счёт');const mode=$('discountMode').value;
+ put('items/'+rid(12),{billId:id,kind:'discount',name:mode==='proportional'?'Скидка (пропорционально)':'Скидка (поровну)',amount,mode,created:Date.now()});$('discountAmount').value=''}
+function removeItem(id){put('items/'+id,null)}
+function markPaid(from,to,v){if(!confirm(`${mname(from)} перевёл(а) ${fmt(v)} → ${mname(to)}?`))return;put('expenses/'+rid(12),{name:'Перевод долга',category:'Перевод',transfer:true,amount:Math.round(v*100)/100,currency:'KZT',rate:1,payer:from,owners:[to],date:today(),created:Date.now()});toast('Перевод записан')}
+function saveGroupName(){const n=$('groupNameInput').value.trim();if(n){put('meta/name',n);toast('Название сохранено')}}
+function updateDishPreview(){const b=S.bills[curBill()];$('dishPreview').textContent='Итого по позиции: '+fmtc(readNum('dishPrice')*readNum('dishQty'),b?.currency||'KZT')}
+
+/* ---------- отрисовка ---------- */
+function initStatic(){
+ document.querySelectorAll('.currency').forEach(s=>{s.innerHTML=CURRENCIES.map(c=>`<option value="${c[0]}">${c[1]} ${c[0]}</option>`).join('');const rate=s.dataset.rate;
+  s.addEventListener('change',()=>{const last=lsGet('nb-rates',{})[s.value];$(rate).value=s.value==='KZT'?1:(last||'')})});
+ document.querySelectorAll('.tab[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+ $('expDate').value=today();
+ ['dishPrice','dishQty'].forEach(i=>$(i).addEventListener('input',updateDishPreview));
+ $('receiptFile').addEventListener('change',()=>{const f=$('receiptFile').files[0];if(!f)return;$('receiptPreview').src=URL.createObjectURL(f);$('receiptPreview').classList.remove('hidden')});
+ ['expRate','nbRate','ebRate'].forEach(i=>$(i).addEventListener('change',()=>{const cur=document.querySelector(`[data-rate="${i}"]`).value,r=readNum(i);if(cur!=='KZT'&&r>0){const m=lsGet('nb-rates',{});m[cur]=r;lsSet('nb-rates',m)}}));
+}
+function showTab(t){document.querySelectorAll('.tab[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===t));document.querySelectorAll('.view').forEach(x=>x.classList.toggle('hidden',x.id!==t))}
+function renderAll(){
+ if(firstLoad)return;
+ const c=calc(),tr=settle(c.bal);
+ document.title=(S.meta.name||'Наш бюджет')+' · Наш бюджет';
+ $('groupTitle').textContent=S.meta.name||'Наш бюджет';
+ $('total').textContent=fmt(c.total);$('expenseCount').textContent=c.ops+' операций';$('memberCount').textContent=memberList().length;$('transferCount').textContent=tr.length;
+ renderPickers();renderSelects();renderBills();renderHistory();renderSettle(c,tr);renderReports(c);renderSettings();
+}
+let pickSig='';
+function renderPickers(){
+ const ms=memberList(),sig=ms.map(m=>m.id+':'+m.name).join('|');if(sig===pickSig)return;
+ ['expPeople','dishPeople','servicePeople'].forEach(id=>{const el=$(id),had=pickSig!=='',prev=new Set(selected(id)),known=new Set([...el.querySelectorAll('input')].map(x=>x.value)),def=el.dataset.default==='all';
+  el.innerHTML=ms.map(m=>{const on=had&&known.has(m.id)?prev.has(m.id):def;return `<label class="person"><input type="checkbox" value="${m.id}" ${on?'checked':''}>${esc(m.name)}</label>`}).join('')});
+ pickSig=sig;
+}
+function renderSelects(force){
+ const ms=memberList(),opts=ms.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('');
+ document.querySelectorAll('.memberSelect').forEach(s=>{const v=s.value;if(s.dataset.sig!==opts||force){s.innerHTML=opts;s.dataset.sig=opts;s.value=S.members[v]&&!force?v:(me()||ms[0]?.id||'')}});
+ const ms2=$('meSelect');const o2='<option value="">— не выбрано —</option>'+opts;if(ms2.dataset.sig!==o2){ms2.innerHTML=o2;ms2.dataset.sig=o2}ms2.value=me()||'';
+}
+function billsSorted(){return Object.entries(S.bills).map(([id,b])=>({id,...b})).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.created||0)-(a.created||0))}
+function renderBills(){
+ const bills=billsSorted();if(!curBill()&&bills.length)activeBill=bills[0].id;const id=curBill();
+ $('billChips').innerHTML=`<button class="bill new" onclick="toggleNewBill(true)">＋ Новый счёт</button>`+bills.map(b=>`<button class="bill ${b.id===id?'active':''}" onclick="setActiveBill('${b.id}')"><b>${esc(b.name)}</b><span>${fdate(b.date)} · ${fmtc(billCalc(b.id).total,b.currency)}</span></button>`).join('');
+ $('noBill').classList.toggle('hidden',!!id);$('billArea').classList.toggle('hidden',!id);if(!id)return;
+ const b=S.bills[id],c=billCalc(id),cur=b.currency,kzt=cur!=='KZT';
+ $('billTitle').textContent=b.name;$('billMeta').textContent=`${fdate(b.date)} · оплатил(а) ${mname(b.payer)} · ${cur}${kzt?' · курс '+b.rate+' ₸':''}`;
+ $('billItems').innerHTML=c.items.length?c.items.map(i=>{const v=i.kind==='dish'?i.qty*i.price:i.kind==='discount'?-i.amount:i.amount;
+  const who=i.kind==='discount'?'Все, кто заказывал':names(i.owners);
+  return `<div class="item"><div class="itemtop"><div><strong>${i.kind==='dish'?'':i.kind==='discount'?'🏷 ':'💁 '}${esc(i.name)}${i.kind==='dish'&&i.qty!==1?' × '+i.qty:''}</strong><div class="sub">${who}${i.kind==='dish'&&i.qty!==1?' · '+fmtc(i.price,cur)+' за шт.':''}</div></div><div class="row" style="flex-wrap:nowrap"><span class="amount ${v<0?'plus':''}">${fmtc(v,cur)}</span><button class="danger small" onclick="removeItem('${i.id}')" title="Удалить">✕</button></div></div></div>`}).join(''):'<div class="empty">В этом счёте пока нет позиций. Добавьте первое блюдо ниже.</div>';
+ $('billTotals').innerHTML=`<span>Блюда и напитки</span><span class="n">${fmtc(c.sub,cur)}</span>`+(c.service?`<span>Сервис / чаевые</span><span class="n">${fmtc(c.service,cur)}</span>`:'')+(c.discount?`<span>Скидка</span><span class="n plus">−${fmtc(c.discount,cur)}</span>`:'')+`<span class="grand">Итого по счёту</span><span class="grand n">${fmtc(c.total,cur)}${kzt?' · '+fmt(c.total*b.rate):''}</span>`;
+ const rows=memberList().filter(m=>c.share[m.id]);
+ $('billShares').innerHTML=rows.length?`<table><thead><tr><th>Участник</th><th class="n">Доля</th>${kzt?'<th class="n">В тенге</th>':''}</tr></thead><tbody>${rows.map(m=>`<tr><td>${esc(m.name)}${m.id===b.payer?' <span class="pill">оплатил(а)</span>':''}</td><td class="n">${fmtc(c.share[m.id],cur)}</td>${kzt?`<td class="n">${fmt(c.share[m.id]*b.rate)}</td>`:''}</tr>`).join('')}</tbody></table>`:'<div class="sub">Появится, когда добавите блюда.</div>';
+ updateDishPreview();
+}
+function renderHistory(){
+ const f=$('historyFilter').value,list=[];
+ Object.entries(S.expenses).forEach(([id,e])=>{const t=e.transfer?'transfer':'regular';if(f==='all'||f===t)list.push({t,id,e,date:e.date||'',created:e.created||0})});
+ if(f==='all'||f==='restaurant')billsSorted().forEach(b=>list.push({t:'bill',id:b.id,b,date:b.date||'',created:b.created||0}));
+ list.sort((a,b)=>b.date.localeCompare(a.date)||b.created-a.created);
+ $('historyList').innerHTML=list.length?list.map(x=>{
+  if(x.t==='bill'){const b=x.b,c=billCalc(b.id),cur=b.currency;
+   return `<details class="hist"><summary><div class="itemtop"><div><strong><span class="chev">›</span> 🍽 ${esc(b.name)}</strong><div class="sub">${fdate(b.date)} · ресторанный счёт · ${c.items.filter(i=>i.kind==='dish').length} позиций · оплатил(а) ${esc(mname(b.payer))}</div></div><div class="amount">${fmt(c.total*b.rate)}${cur!=='KZT'?`<div class="sub">${fmtc(c.total,cur)}</div>`:''}</div></div></summary><div class="body">
+   <table><thead><tr><th>Позиция</th><th>Кто</th><th class="n">Сумма</th></tr></thead><tbody>${c.items.map(i=>`<tr><td>${esc(i.name)}${i.kind==='dish'&&i.qty!==1?' × '+i.qty:''}</td><td>${i.kind==='discount'?'все':names(i.owners)}</td><td class="n">${fmtc(i.kind==='dish'?i.qty*i.price:i.kind==='discount'?-i.amount:i.amount,cur)}</td></tr>`).join('')}</tbody></table>
+   <h3>Доли</h3><div class="sub">${memberList().filter(m=>c.share[m.id]).map(m=>`${esc(m.name)}: ${fmt(c.share[m.id]*b.rate)}`).join(' · ')||'—'}</div>
+   <div class="actions"><button class="small" onclick="setActiveBill('${b.id}');showTab('restaurant')">Открыть счёт</button></div></div></details>`}
+  const e=x.e;return `<div class="item"><div class="itemtop"><div><strong>${e.transfer?'↔ ':''}${esc(e.name)}</strong><div class="sub">${fdate(e.date)} · ${esc(e.category)}</div></div><div class="amount">${fmt(e.amount*e.rate)}${e.currency!=='KZT'?`<div class="sub">${fmtc(e.amount,e.currency)}</div>`:''}</div></div><div class="sub">${e.transfer?`${esc(mname(e.payer))} → ${names(e.owners)}`:`Оплатил(а): ${esc(mname(e.payer))} · Доля: ${names(e.owners)}`}</div><div class="actions"><button class="danger small" onclick="removeExpense('${x.id}')">Удалить</button></div></div>`}).join(''):'<div class="empty">Расходов пока нет.</div>';
+}
+function renderSettle(c,tr){
+ $('balances').innerHTML=memberList().map(m=>{const v=c.bal[m.id]||0;return `<div class="item itemtop"><strong>${esc(m.name)}</strong><strong class="${v>.5?'plus':v<-.5?'minus':''}">${v>.5?'+':''}${fmt(Math.abs(v)<.5?0:v)}</strong></div>`}).join('');
+ $('transfers').innerHTML=tr.length?tr.map(x=>`<div class="item"><div class="itemtop"><div><strong>${esc(mname(x.from))} → ${esc(mname(x.to))}</strong></div><div class="row" style="flex-wrap:nowrap"><strong>${fmt(x.v)}</strong><button class="small" onclick="markPaid('${x.from}','${x.to}',${x.v})">Перевёл</button></div></div></div>`).join(''):'<div class="empty">Все расчёты закрыты.</div>';
+}
+function renderReports(c){
+ const n=memberList().length||1;$('reportTotal').textContent=fmt(c.total);$('reportOps').textContent=c.ops;$('reportAverage').textContent=fmt(c.total/n);
+ const max=Math.max(1,...Object.values(c.cats));
+ $('categoryReport').innerHTML=Object.entries(c.cats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div style="margin:10px 0"><div class="row between"><strong>${esc(k)}</strong><span>${fmt(v)}</span></div><div class="bar"><span style="width:${Math.max(0,v/max*100)}%"></span></div></div>`).join('')||'<div class="empty">Нет данных</div>';
+ $('payerReport').innerHTML=`<table><thead><tr><th>Участник</th><th class="n">Оплатил</th><th class="n">Потратил</th><th class="n">Баланс</th></tr></thead><tbody>${memberList().map(m=>{const b=c.bal[m.id]||0;return `<tr><td>${esc(m.name)}</td><td class="n">${fmt(c.paid[m.id])}</td><td class="n">${fmt(c.cons[m.id])}</td><td class="n ${b>.5?'plus':b<-.5?'minus':''}">${fmt(Math.abs(b)<.5?0:b)}</td></tr>`}).join('')}</tbody></table>`;
+}
+let memSig='';
+function renderSettings(){
+ $('shareLink').value=shareUrl();
+ const gi=$('groupNameInput');if(document.activeElement!==gi)gi.value=S.meta.name||'';
+ $('syncNotice').className='notice'+(store.kind==='cloud'?' ok':'');
+ $('syncNotice').textContent=store.kind==='cloud'?'Синхронизация включена: данные хранятся в облаке и обновляются у всех участников в реальном времени. Изменения, сделанные без интернета, отправятся автоматически при подключении. Делитесь ссылкой только с теми, кому доверяете: по ней можно редактировать расходы.':'Синхронизация пока не настроена: данные хранятся только в этом браузере.';
+ const ms=memberList(),sig=ms.map(m=>m.id+':'+m.name+':'+memberUsed(m.id)).join('|'),box=$('memberList');
+ if(sig===memSig||box.contains(document.activeElement))return;memSig=sig;
+ box.innerHTML=ms.map(m=>`<div class="mrow"><input data-mid="${m.id}" value="${esc(m.name)}" onkeydown="if(event.key==='Enter')renameMember('${m.id}')"><button class="small" onclick="renameMember('${m.id}')">Сохранить</button><button class="danger small" onclick="removeMember('${m.id}')" ${memberUsed(m.id)?'disabled title="Участвует в расходах"':''}>Удалить</button></div>`).join('');
+}
+
+/* ---------- данные ---------- */
+function download(blob,name){const a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function fileBase(){return (S.meta.name||'nash-budget').replace(/[^\p{L}\p{N}]+/gu,'-').toLowerCase()}
+function exportJSON(){download(new Blob([JSON.stringify({format:'nash-budget-2',exported:new Date().toISOString(),...S},null,2)],{type:'application/json'}),fileBase()+'-backup.json')}
+function exportCSV(){
+ const rows=[['Дата','Тип','Название','Категория','Количество','Сумма','Валюта','Курс к KZT','Сумма KZT','Плательщик','Участники']];
+ Object.values(S.expenses).forEach(e=>rows.push([e.date,e.transfer?'перевод':'расход',e.name,e.category,1,e.amount,e.currency,e.rate,e.amount*e.rate,mname(e.payer),arr(e.owners).map(mname).join('; ')]));
+ billsSorted().forEach(b=>itemsOf(b.id).forEach(i=>{const v=i.kind==='dish'?i.qty*i.price:i.kind==='discount'?-i.amount:i.amount;rows.push([b.date,'ресторан: '+b.name,i.name,'Ресторан',i.qty||1,v,b.currency,b.rate,v*b.rate,mname(b.payer),i.kind==='discount'?'все заказавшие':arr(i.owners).map(mname).join('; ')])}));
+ const csv='﻿'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\n');download(new Blob([csv],{type:'text/csv;charset=utf-8'}),fileBase()+'.csv');
+}
+function convertImport(obj){
+ const up={},byName={};let order=Math.max(0,...memberList().map(m=>m.order||0))+1;
+ memberList().forEach(m=>byName[m.name.trim().toLowerCase()]=m.id);
+ const mid=n=>{n=String(n||'').trim();if(!n)return null;const k=n.toLowerCase();if(!byName[k]){const id=rid(8);byName[k]=id;up['members/'+id]={name:n,order:order++}}return byName[k]};
+ if(obj&&obj.format==='nash-budget-2'){
+  const map={};Object.entries(obj.members||{}).forEach(([id,m])=>map[id]=mid(m.name));const mm=a=>arr(a).map(x=>map[x]).filter(Boolean);
+  Object.values(obj.expenses||{}).forEach(e=>{const x={...e,payer:map[e.payer],owners:mm(e.owners)};if(e.weights){x.weights={};Object.entries(e.weights).forEach(([k,v])=>{if(map[k])x.weights[map[k]]=v})}if(x.payer&&x.owners.length)up['expenses/'+rid(12)]=x});
+  const bmap={};Object.entries(obj.bills||{}).forEach(([id,b])=>{if(!map[b.payer])return;bmap[id]=rid(12);up['bills/'+bmap[id]]={...b,payer:map[b.payer]}});
+  Object.values(obj.items||{}).forEach(i=>{if(!bmap[i.billId])return;const x={...i,billId:bmap[i.billId]};if(i.owners)x.owners=mm(i.owners);up['items/'+rid(12)]=x});
+ }else if(obj&&Array.isArray(obj.members)&&Array.isArray(obj.expenses)){
+  obj.members.forEach(mid);
+  const rest=obj.expenses.filter(e=>e.type==='restaurant'),w={},cnt={};
+  rest.filter(e=>e.qty).forEach(e=>{e.owners.forEach(n=>w[n]=(w[n]||0)+e.amount*e.rate/e.owners.length);cnt[e.payer]=(cnt[e.payer]||0)+1});
+  const mainPayer=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0]?.[0]||obj.members[0];
+  obj.expenses.forEach(e=>{const owners=e.owners.map(mid).filter(Boolean);const x={name:e.name+(e.qty&&e.qty!==1?' × '+e.qty:''),category:e.type==='restaurant'?'Ресторан':(e.category||'Другое'),amount:+e.amount,currency:e.currency||'KZT',rate:+e.rate||1,payer:mid(e.isDiscount?mainPayer:e.payer),owners,date:String(e.date||today()).slice(0,10),created:Date.parse(e.date)||Date.now()};
+   if(e.allocation==='proportional'){let s=0;e.owners.forEach(n=>s+=w[n]||0);if(s>0){x.weights={};e.owners.forEach(n=>x.weights[mid(n)]=(w[n]||0)/s)}}
+   if(x.payer&&owners.length)up['expenses/'+rid(12)]=x});
+ }else throw Error('format');
+ return up;
+}
+function importJSON(ev){const f=ev.target.files[0];ev.target.value='';if(!f)return;const r=new FileReader();r.onload=()=>{try{const up=convertImport(JSON.parse(r.result)),n=Object.keys(up).filter(k=>!k.startsWith('members/')).length;if(!n&&!Object.keys(up).length)return toast('В файле нет расходов');if(confirm(`Добавить в группу ${n} записей из файла?`)){putMany(up);toast('Данные импортированы')}}catch(e){toast('Не удалось прочитать файл резервной копии')}};r.readAsText(f)}
+function clearAll(){if(confirm('Удалить ВСЕ расходы и ресторанные счета у всех участников? Это нельзя отменить.'))putMany({expenses:null,bills:null,items:null})}
+async function runOCR(){
+ const f=$('receiptFile').files[0];if(!f)return toast('Сначала выберите фотографию чека');if(!window.Tesseract)return toast('Библиотека распознавания не загрузилась — нужен интернет');
+ $('ocrStatus').textContent='Распознаём чек… Это может занять некоторое время.';$('ocrButton').disabled=true;
+ try{const res=await Tesseract.recognize(f,'rus+eng',{logger:m=>{if(m.status)$('ocrStatus').textContent=m.status+(m.progress?' · '+Math.round(m.progress*100)+'%':'')}});$('ocrText').value=res.data.text;$('ocrStatus').textContent='Готово. Проверьте текст и перенесите позиции в счёт.'}
+ catch(e){$('ocrStatus').textContent='Не удалось распознать чек. Попробуйте более чёткое фото.'}finally{$('ocrButton').disabled=false}
+}
+boot();
+</script>
+</body>
+</html>
