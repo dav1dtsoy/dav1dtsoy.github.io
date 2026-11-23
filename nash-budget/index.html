@@ -86,7 +86,7 @@ button.linkbtn{background:none;padding:0 2px;color:var(--green);text-decoration:
 <header><div class="top"><div><h1>Bill Separator</h1><p>Общие расходы с друзьями · ресторанные счета · кто кому должен</p></div><span id="landingStatus" class="pill"></span></div></header>
 <main>
 <div id="landingError" class="notice hidden" style="margin-bottom:14px"></div>
-<div id="myGroupsPanel" class="hidden"><div class="row between" style="margin:4px 2px 10px"><h2 style="margin:0;font-size:20px">Мои группы</h2><span class="sub" id="myGroupsTotal"></span></div><div id="recentGroups"></div></div>
+<div id="myGroupsPanel" class="hidden"><div class="row between" style="margin:4px 2px 10px"><h2 style="margin:0;font-size:20px">Мои группы</h2></div><div id="recentGroups"></div></div>
 <div class="panel"><h2>Создать новую группу</h2>
 <p class="sub">Группа — это поездка или компания друзей. После создания вы получите ссылку: отправьте её друзьям, и все будут вести расходы вместе.</p>
 <div class="grid">
@@ -344,22 +344,19 @@ async function showLanding(err){
  if(err){$('landingError').textContent=err;$('landingError').classList.remove('hidden')}
  const rec=lsGet('nb-recent',[]);renderMyGroups();if(!rec.length)return;
  if(!CFG){rec.forEach(g=>groupData[g.id]=lsGet('nb-group-'+g.id,null)?norm(lsGet('nb-group-'+g.id,null)):null);return renderMyGroups()}
- try{const {d,db}=await loadFirebase();rec.forEach(g=>d.onValue(d.ref(db,'groups/'+g.id),s=>{groupData[g.id]=s.exists()?norm(s.val()):null;renderMyGroups()},()=>{}))}catch(e){}
+ try{const {d,db}=await loadFirebase();rec.forEach(g=>{const meta={};d.onValue(d.ref(db,'groups/'+g.id+'/meta'),s=>{meta.v=s.val()||{};upd()},()=>{});d.onValue(d.ref(db,'groups/'+g.id+'/members'),s=>{meta.m=s.val();meta.loaded=true;upd()},()=>{});
+  function upd(){if(!meta.loaded)return;groupData[g.id]=meta.m?norm({meta:meta.v,members:meta.m}):null;renderMyGroups()}})}catch(e){}
 }
 // временно подставляет данные чужой группы, чтобы посчитать её итоги теми же функциями
 function withS(data,fn){const o=S;S=data;try{return fn()}finally{S=o}}
 function renderMyGroups(){
- const rec=lsGet('nb-recent',[]);$('myGroupsPanel').classList.toggle('hidden',!rec.length);let sum=0,known=0;
+ const rec=lsGet('nb-recent',[]);$('myGroupsPanel').classList.toggle('hidden',!rec.length);
  $('recentGroups').innerHTML=rec.map(g=>{const data=groupData[g.id],gone=data===null||(data&&!Object.keys(data.members).length);
   const foot=`<div class="gfoot"><a href="?g=${esc(g.id)}"><button class="primary small">Открыть</button></a><button class="ghost small" onclick="forgetGroup('${esc(g.id)}');renderMyGroups()">Убрать из списка</button>${gone?'':`<button class="danger small" onclick="deleteGroup('${esc(g.id)}')">Удалить группу</button>`}</div>`;
   if(gone)return `<div class="gcard"><div class="ghead"><div><h3>${esc(g.name)}</h3><div class="sub">Группа удалена или недоступна</div></div></div>${foot}</div>`;
   if(!data)return `<div class="gcard"><a class="ghead" href="?g=${esc(g.id)}"><div><h3>${esc(g.name)}</h3><div class="sub">${esc(g.members||'')}</div></div><div class="sub">загрузка…</div></a>${foot}</div>`;
-  return withS(data,()=>{const c=calc(),bills=billsSorted(),reg=Object.values(S.expenses).filter(e=>!e.transfer),regSum=reg.reduce((a,e)=>a+e.amount*e.rate,0);sum+=c.total;known++;
-   const rows=bills.map(b=>{const bc=billCalc(b.id),n=bc.items.filter(i=>i.kind==='dish').length;return `<a class="brow" href="?g=${esc(g.id)}" onclick="lsSet('nb-bill-${esc(g.id)}','${b.id}');lsSet('nb-tab-${esc(g.id)}','restaurant')"><div><strong>🍽 ${esc(b.name)}</strong><div class="sub">${fdate(b.date)} · ${plural(n,['позиция','позиции','позиций'])}${b.photos?' · 📷 '+Object.keys(b.photos).length:''}${bc.unassigned?' · ⚠ не всё распределено':''} · оплатил(а) ${esc(mname(b.payer))}</div></div><span class="amount">${fmt(bc.total*(b.rate||1))}</span></a>`}).join('');
-   const regRow=reg.length?`<a class="brow" href="?g=${esc(g.id)}" onclick="lsSet('nb-tab-${esc(g.id)}','history')"><div><strong>Обычные расходы</strong><div class="sub">${plural(reg.length,['операция','операции','операций'])} — такси, жильё и т. п.</div></div><span class="amount">${fmt(regSum)}</span></a>`:'';
-   return `<div class="gcard"><a class="ghead" href="?g=${esc(g.id)}"><div><h3>${esc(S.meta.name||g.name)}</h3><div class="sub">${memberList().map(m=>esc(m.name)).join(', ')}</div></div><div><div class="gtotal">${fmt(c.total)}</div><div class="sub" style="text-align:right">${plural(bills.length,['чек','чека','чеков'])}</div></div></a>${rows||regRow?`<div class="glist">${rows}${regRow}</div>`:'<div class="glist"><div class="sub" style="padding:10px 0">Пока нет чеков и расходов</div></div>'}${foot}</div>`});
+  return withS(data,()=>`<div class="gcard"><a class="ghead" href="?g=${esc(g.id)}"><div><h3>${esc(S.meta.name||g.name)}</h3><div class="sub">${plural(memberList().length,['участник','участника','участников'])}: ${memberList().map(m=>esc(m.name)).join(', ')}</div></div></a>${foot}</div>`);
  }).join('');
- $('myGroupsTotal').textContent=known>1?'Всего по группам: '+fmt(sum):'';
 }
 async function deleteGroup(id){
  const name=(groupData[id]&&groupData[id].meta.name)||(id===gid&&S.meta.name)||lsGet('nb-recent',[]).find(g=>g.id===id)?.name||'Группа';
