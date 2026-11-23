@@ -64,8 +64,6 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:12px}
 .ph img{width:100%;height:170px;object-fit:cover;display:block;cursor:zoom-in;background:#e4ebe7}
 .ph .sub{padding:6px 8px 0}.ph .pa{display:flex;gap:6px;padding:8px}.ph .pa button{flex:1}
 .primary-label{background:var(--green)!important;color:#fff!important;display:inline-flex;align-items:center;gap:6px}
-.prow{display:grid;grid-template-columns:28px minmax(0,1fr) 64px 110px;gap:6px;align-items:center;margin:5px 0}
-.prow input{padding:8px 9px}.prow.off input:not([type=checkbox]){opacity:.45}.phead{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
 .chip{padding:7px 12px;border-radius:99px;background:#fff;border:1px solid #cfdcd5;color:var(--ink);font-weight:600;font-size:13px}
 .chip.on{background:var(--green);color:#fff;border-color:var(--green)}.chip.mine{outline:2px solid #e0b44a;outline-offset:1px}
@@ -176,20 +174,9 @@ button.linkbtn{background:none;padding:0 2px;color:var(--green);text-decoration:
 </div>
 
 <div class="panel" id="photoPanel"><div class="row between"><h2 style="margin:0">Фото чека</h2><label class="tab primary-label">📷 Загрузить фото<input type="file" accept="image/*" id="photoInput" multiple style="display:none"></label></div>
-<p class="sub">Фото видят все участники группы. Нажмите «Разобрать чек» — строки чека превратятся в позиции, и каждый сможет отметить, что он ел.</p>
+<p class="sub">Фото видят все участники группы. Нажмите на фото, чтобы открыть его крупно.</p>
 <div id="photoStatus" class="sub"></div>
 <div id="photoGrid" class="photos"></div>
-<div class="field" style="max-width:280px;margin-top:12px"><label>Язык чека для распознавания</label><select id="ocrLang"><option value="rus+eng">Русский / английский</option><option value="kor+eng">Корейский</option><option value="kaz+rus+eng">Казахский</option></select></div>
-<div id="parseArea" class="hidden">
- <h3>Позиции из чека</h3>
- <p class="sub">Проверьте названия, количество и цены — распознавание иногда ошибается. Снимите галочку со строк, которые не нужны.</p>
- <div class="prow phead"><span></span><span>Название</span><span>Кол-во</span><span>Цена за шт.</span></div>
- <div id="parseRows"></div>
- <div class="actions" style="margin-top:6px"><button class="ghost small" onclick="addParseRow()">＋ Добавить строку</button></div>
- <div id="parseSum" class="notice" style="margin-top:10px"></div>
- <div class="actions"><button class="primary" onclick="importParsed()">Добавить позиции в счёт</button><button class="ghost" onclick="closeParse()">Отмена</button></div>
- <details style="margin-top:10px"><summary class="sub" style="cursor:pointer">Распознанный текст целиком</summary><pre id="ocrRaw" style="white-space:pre-wrap;font-size:12px;background:#f4f6f5;padding:10px;border-radius:9px"></pre></details>
-</div>
 </div>
 
 <div class="panel"><h2>Добавить позицию в счёт</h2>
@@ -629,13 +616,13 @@ function convertImport(obj){
 }
 function importJSON(ev){if(!who())return;const f=ev.target.files[0];ev.target.value='';if(!f)return;const r=new FileReader();r.onload=()=>{try{const up=convertImport(JSON.parse(r.result)),n=Object.keys(up).filter(k=>!k.startsWith('members/')).length;if(!n&&!Object.keys(up).length)return toast('В файле нет расходов');if(confirm(`Добавить в группу ${n} записей из файла?`)){act('import',`${n} записей из файла «${f.name}»`,up);toast('Данные импортированы')}}catch(e){toast('Не удалось прочитать файл резервной копии')}};r.readAsText(f)}
 function clearAll(){if(!who())return;if(confirm('Удалить ВСЕ расходы и ресторанные счета у всех участников? Это нельзя отменить.'))act('clear','',{expenses:null,bills:null,items:null})}
-/* ---------- фото чека, разбор и распределение ---------- */
-let distMode=false,photoBill=null,photoUnsub=null,photos={},parseRows=[],parseTotal=null,parseBill=null,lastAssign=null;
+/* ---------- фото чека и распределение ---------- */
+let distMode=false,photoBill=null,photoUnsub=null,photos={},lastAssign=null;
 const openItems=new Set();
-function watchPhotos(bid){if(bid===photoBill)return;try{photoUnsub&&photoUnsub()}catch(e){}photos={};photoBill=bid;openItems.clear();closeParse();renderPhotos();photoUnsub=bid?store.photos(bid,v=>{photos=v||{};renderPhotos()}):null}
+function watchPhotos(bid){if(bid===photoBill)return;try{photoUnsub&&photoUnsub()}catch(e){}photos={};photoBill=bid;openItems.clear();renderPhotos();photoUnsub=bid?store.photos(bid,v=>{photos=v||{};renderPhotos()}):null}
 function renderPhotos(){
  const list=Object.entries(photos).filter(([,p])=>p&&typeof p.data==='string'&&p.data.startsWith('data:image/')).sort((a,b)=>(a[1].at||0)-(b[1].at||0));
- $('photoGrid').innerHTML=list.length?list.map(([pid,p])=>`<div class="ph"><img src="${esc(p.data)}" alt="Фото чека" onclick="openLightbox('${pid}')"><div class="sub">${p.by?esc(mname(p.by))+', ':''}${p.at?fdt(p.at):''}</div><div class="pa"><button class="primary small" onclick="parsePhoto('${pid}')">Разобрать чек</button><button class="danger small" onclick="deletePhoto('${pid}')" title="Удалить фото">✕</button></div></div>`).join(''):'<div class="sub">Фото пока нет. Сфотографируйте чек — его увидят все.</div>';
+ $('photoGrid').innerHTML=list.length?list.map(([pid,p])=>`<div class="ph"><img src="${esc(p.data)}" alt="Фото чека" onclick="openLightbox('${pid}')"><div class="sub">${p.by?esc(mname(p.by))+', ':''}${p.at?fdt(p.at):''}</div><div class="pa"><button class="ghost small" onclick="openLightbox('${pid}')">Открыть</button><button class="danger small" onclick="deletePhoto('${pid}')" title="Удалить фото">✕</button></div></div>`).join(''):'<div class="sub">Фото пока нет. Сфотографируйте чек — его увидят все.</div>';
 }
 function openLightbox(pid){const p=photos[pid];if(!p)return;$('lbImg').src=p.data;$('lightbox').classList.remove('hidden')}
 async function compressImage(file){
@@ -659,75 +646,6 @@ async function uploadPhotos(files){
 async function deletePhoto(pid){if(!who())return;const bid=photoBill,b=S.bills[bid];if(!bid||!confirm('Удалить это фото чека у всех?'))return;
  try{await store.setPhoto(bid,pid,null);act('photo_del',`из счёта «${b?b.name:''}»`,{['bills/'+bid+'/photos/'+pid]:null})}catch(e){toast('Не удалось удалить: '+e.message)}}
 
-// --- распознавание ---
-let tessLoading=null;
-function loadTesseract(){if(window.Tesseract)return Promise.resolve();return tessLoading||(tessLoading=new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';s.onload=res;s.onerror=()=>{tessLoading=null;rej(Error('нет интернета'))};document.head.appendChild(s)}))}
-async function parsePhoto(pid){
- const p=photos[pid];if(!p)return;const st=$('photoStatus'),lang=$('ocrLang').value;
- st.textContent='Загружаем распознавание…';
- try{await loadTesseract();
-  const res=await Tesseract.recognize(p.data,lang,{logger:m=>{if(m.status==='recognizing text')st.textContent='Распознаём чек… '+Math.round((m.progress||0)*100)+'%';else if(m.status)st.textContent='Подготовка: '+m.status}});
-  const r=parseReceipt(res.data.text);parseRows=r.rows;parseTotal=r.total;parseBill=photoBill;$('ocrRaw').textContent=res.data.text;
-  if(r.service)$('serviceAmount').value=r.service;if(r.discount)$('discountAmount').value=r.discount;
-  st.textContent=parseRows.length?`Найдено строк: ${parseRows.length}. Проверьте их ниже.`:'Не удалось найти позиции. Попробуйте более чёткое фото, другой язык или добавьте строки вручную.';
-  if(!parseRows.length)parseRows=[{on:true,name:'',qty:1,price:0}];
-  renderParse();$('parseArea').classList.remove('hidden');$('parseArea').scrollIntoView({behavior:'smooth',block:'start'});
- }catch(e){st.textContent='Не удалось распознать чек: '+e.message}
-}
-function toNum(t){t=String(t).replace(/[^\d.,]/g,'');if(!t)return NaN;
- if(/^\d{1,3}([.,]\d{3})+$/.test(t))return +t.replace(/[.,]/g,'');
- if(/^\d+[.,]\d{1,2}$/.test(t))return +t.replace(',','.');return +t.replace(/[.,]/g,'')}
-function numsOf(str){return (str.match(/\d[\d.,]*/g)||[]).map(toNum).filter(n=>isFinite(n))}
-function guess(str){ // → {qty,price,total,ok}
- const x=str.match(/(\d+(?:[.,]\d+)?)\s*(?:шт\.?|pcs|개)?\s*[x×*хХ]\s*(\d[\d.,]*)/i);
- const n=numsOf(str);if(!n.length)return null;const last=n[n.length-1];
- if(x){const q=toNum(x[1]),pr=toNum(x[2]);if(q>0&&pr>0)return {qty:q,price:pr,total:q*pr,ok:Math.abs(q*pr-last)<1||n.length<=2}}
- if(n.length>=3){for(let a=0;a<n.length-1;a++)for(let b=a+1;b<n.length-1;b++){const A=n[a],B=n[b];
-   if(Number.isInteger(A)&&A>0&&A<100&&Math.abs(A*B-last)<1)return {qty:A,price:B,total:last,ok:true};
-   if(Number.isInteger(B)&&B>0&&B<100&&Math.abs(A*B-last)<1)return {qty:B,price:A,total:last,ok:true}}}
- if(n.length>=2){const A=n[n.length-2];if(A===last)return {qty:1,price:last,total:last,ok:true};
-  if(Number.isInteger(A)&&A>0&&A<=20)return {qty:A,price:Math.round(last/A*100)/100,total:last,ok:true}}
- return {qty:1,price:last,total:last,ok:n.length===1}}
-function parseReceipt(text){
- const SKIP=/(сумма|ндс|налог|сдача|наличн|безнал|картой|банк\.?\s*карт|оплата|оплачено|чек\s*(№|#|\d)|кассир|касса|дата|время|спасибо|тел[.:]|официант|стол\s*[№#:\d]|гост(ей|и|ь)\s*[:\d]|инн|бин\b|смена|фиск|\bsubtotal\b|\bamount\b|\btax\b|\bvat\b|\bchange\b|\bcash\b|\bcard\b|visa|mastercard|thank|\btable\b|\bguests?\b|\bdate\b|\btime\b|\bserver\b|소계|부가세|과세|면세|카드|현금|거스름|받은|결제|승인|일시|테이블|감사|사업자|대표|전화|주소)/i;
- const SERV=/(обслуживан|сервисный|service|чаевые|\btips?\b|봉사료)/i,DISC=/(скидк|discount|할인)/i,TOT=/(итог|всего|к оплате|\btotal\b|합계|총액|받을\s*금액)/i;
- const rows=[];let total=null,service=0,discount=0;
- text.split(/\n/).forEach(raw=>{
-  let l=raw.replace(/[|_~«»"]/g,' ').replace(/\s+/g,' ').trim().replace(/^\d{1,3}[.)]\s+/,'');if(l.length<3)return;
-  const merged=l.replace(/(\d)[  ](?=\d{3}(?!\d))/g,'$1');
-  const nm=numsOf(merged);if(!nm.length)return;const last=nm[nm.length-1];
-  if(TOT.test(l)&&!/под[ыи]тог|sub/i.test(l)){total=last;return}
-  if(SERV.test(l)){service=last;return}
-  if(DISC.test(l)){discount=Math.abs(last);return}
-  if(SKIP.test(l))return;
-  const name=(l.match(/^[^\d]*/)||[''])[0].replace(/[^\p{L}\p{N}\s()\-+%.,/]/gu,' ').replace(/[\s.,\-]+$/,'').replace(/\s+/g,' ').trim();
-  if((name.match(/\p{L}/gu)||[]).length<2)return;
-  const a=guess(merged),b=guess(l);const g=(a&&a.ok)?a:(b&&b.ok)?b:a||b;
-  if(!g||!(g.total>0)||g.total>1e8)return;
-  rows.push({on:true,name,qty:g.qty,price:g.price});
- });
- return {rows,total,service,discount};
-}
-function renderParse(){
- $('parseRows').innerHTML=parseRows.map((r,k)=>`<div class="prow${r.on?'':' off'}"><input type="checkbox" ${r.on?'checked':''} onchange="parseRows[${k}].on=this.checked;renderParse()"><input value="${esc(r.name)}" oninput="parseRows[${k}].name=this.value" placeholder="Название"><input type="number" min="0" step="1" inputmode="decimal" value="${r.qty}" oninput="parseRows[${k}].qty=readVal(this);updateParseSum()"><input type="number" min="0" step="0.01" inputmode="decimal" value="${r.price}" oninput="parseRows[${k}].price=readVal(this);updateParseSum()"></div>`).join('');
- updateParseSum();
-}
-function readVal(el){const v=parseFloat(String(el.value).replace(',','.'));return isFinite(v)?v:0}
-function updateParseSum(){const b=S.bills[parseBill];if(!b)return;const on=parseRows.filter(r=>r.on&&r.name.trim()&&r.qty>0&&r.price>0),sum=on.reduce((a,r)=>a+r.qty*r.price,0);
- let t=`Выбрано: ${plural(on.length,['позиция','позиции','позиций'])} на <strong>${fmtc(sum,b.currency)}</strong>.`;
- if(parseTotal)t+=Math.abs(parseTotal-sum)<1?` Совпадает с итогом по чеку ✓`:` Итог по чеку: ${fmtc(parseTotal,b.currency)} — разница ${fmtc(parseTotal-sum,b.currency)}, проверьте строки${$('serviceAmount').value?' (сервисный сбор подставлен ниже, в разделе «Сервисный сбор»)':''}.`;
- $('parseSum').innerHTML=t}
-function addParseRow(){parseRows.push({on:true,name:'',qty:1,price:0});renderParse();const ins=$('parseRows').querySelectorAll('.prow:last-child input');ins[1]&&ins[1].focus()}
-function closeParse(){$('parseArea').classList.add('hidden');parseRows=[];parseTotal=null}
-function importParsed(){
- if(!who())return;const bid=parseBill,b=S.bills[bid];if(!b)return toast('Счёт не найден');
- const on=parseRows.filter(r=>r.on&&r.name.trim()&&r.qty>0&&r.price>0);if(!on.length)return toast('Нет выбранных позиций с названием и ценой');
- const up={},t0=Date.now();let sum=0;
- on.forEach((r,k)=>{sum+=r.qty*r.price;up['items/'+rid(12)]={billId:bid,kind:'dish',name:r.name.trim(),qty:r.qty,price:r.price,owners:[],created:t0+k,by:me(),at:t0,fromReceipt:true}});
- act('receipt_import',`${plural(on.length,['позиция','позиции','позиций'])} на ${fmtc(sum,b.currency)} в счёт «${b.name}»`,up);
- closeParse();distMode=true;$('photoStatus').textContent='';renderBills();
- $('billItems').scrollIntoView({behavior:'smooth',block:'start'});toast('Позиции добавлены — теперь каждый отмечает, что он ел');
-}
 function toggleOwner(id,mid){
  if(!who())return;const i=S.items[id];if(!i)return;const own=arr(i.owners),n=own.includes(mid)?own.filter(x=>x!==mid):[...own,mid];
  // несколько нажатий подряд по одной позиции — одна строка в журнале
