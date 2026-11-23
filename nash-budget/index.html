@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Наш бюджет</title>
+<title>Bill Separator</title>
 <meta name="theme-color" content="#17483d">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Наш бюджет">
+<meta name="apple-mobile-web-app-title" content="Bill Separator">
 <style>
 :root{--green:#17483d;--mint:#e9f3ee;--bg:#f4f6f5;--ink:#17231f;--muted:#68756f;--line:#e1e8e4;--red:#b64242;--plus:#26734e}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink)}
@@ -83,7 +83,7 @@ button.linkbtn{background:none;padding:0 2px;color:var(--green);text-decoration:
 
 <!-- ============ СТАРТОВЫЙ ЭКРАН ============ -->
 <div id="landing" class="hidden">
-<header><div class="top"><div><h1>НАШ БЮДЖЕТ</h1><p>Общие расходы с друзьями · ресторанные счета · кто кому должен</p></div><span id="landingStatus" class="pill"></span></div></header>
+<header><div class="top"><div><h1>Bill Separator</h1><p>Общие расходы с друзьями · ресторанные счета · кто кому должен</p></div><span id="landingStatus" class="pill"></span></div></header>
 <main>
 <div id="landingError" class="notice hidden" style="margin-bottom:14px"></div>
 <div id="myGroupsPanel" class="hidden"><div class="row between" style="margin:4px 2px 10px"><h2 style="margin:0;font-size:20px">Мои группы</h2><span class="sub" id="myGroupsTotal"></span></div><div id="recentGroups"></div></div>
@@ -104,7 +104,7 @@ button.linkbtn{background:none;padding:0 2px;color:var(--green);text-decoration:
 
 <!-- ============ ПРИЛОЖЕНИЕ ============ -->
 <div id="app" class="hidden">
-<header><div class="top"><div><h1 id="groupTitle">Наш бюджет</h1><p id="onlineLine">Совместные расходы · ресторанные счета · расчёты</p></div>
+<header><div class="top"><div><h1 id="groupTitle">Bill Separator</h1><p id="onlineLine">Совместные расходы · ресторанные счета · расчёты</p></div>
 <div class="hright"><span id="syncStatus" class="pill">Подключение…</span><button id="meBtn" onclick="openWho()">Кто я?</button><button onclick="copyLink()">Пригласить друзей</button><button onclick="goHome()" title="Все группы">⌂</button></div></div></header>
 <main>
 <div id="loading" class="empty">Загружаем данные группы…</div>
@@ -233,7 +233,7 @@ button.linkbtn{background:none;padding:0 2px;color:var(--green);text-decoration:
 <div class="panel"><h2>Удалить группу</h2><p class="sub">Группа, все её чеки, расходы и журнал удалятся у всех участников, ссылка перестанет работать. Перед удалением можно скачать резервную копию выше.</p><div class="actions"><button class="danger" onclick="deleteGroup(gid)">Удалить группу навсегда</button></div></div>
 </section>
 </div>
-<footer>Наш бюджет · расчёты ведутся в тенге по сохранённому курсу каждой операции</footer>
+<footer>Bill Separator · расчёты ведутся в тенге по сохранённому курсу каждой операции</footer>
 </main>
 </div>
 <div id="whoModal" class="modal hidden"><div class="sheet">
@@ -254,6 +254,14 @@ const CFG=window.FIREBASE_CONFIG||null;
 const CURRENCIES=[['KZT','₸'],['USD','$'],['EUR','€'],['RUB','₽'],['KRW','₩'],['CNY','¥'],['TRY','₺'],['AED','AED'],['THB','฿'],['UZS','сум'],['KGS','сом'],['GEL','₾']];
 const SYM=Object.fromEntries(CURRENCIES);
 const $=id=>document.getElementById(id);
+const HOME='https://bill-separator.vercel.app/';
+// старый адрес на github.io → новый; список групп и «кто я» переезжают вместе со ссылкой
+const MOVED=location.hostname.endsWith('github.io');
+if(MOVED){const keep={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(/^nb-(recent|me-|device|rates|visit-)/.test(k))keep[k]=localStorage.getItem(k)}}catch(e){}
+ location.replace(HOME+location.search+'#m='+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(keep))))))}
+else if(location.hash.startsWith('#m=')){try{const o=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(location.hash.slice(3))))));
+ Object.entries(o).forEach(([k,v])=>{if(k==='nb-recent'){const cur=JSON.parse(localStorage.getItem(k)||'[]'),add=JSON.parse(v||'[]');localStorage.setItem(k,JSON.stringify([...cur,...add.filter(g=>!cur.some(c=>c.id===g.id))]))}else if(localStorage.getItem(k)==null)localStorage.setItem(k,v)})}catch(e){}
+ history.replaceState(null,'',location.pathname+location.search)}
 let S=emptyState(),store=null,gid=null,activeBill=null,firstLoad=true;
 const DEVICE=(()=>{let d=lsGet('nb-device',null);if(!d){d=rid(12);lsSet('nb-device',d)}return d})();
 
@@ -513,8 +521,8 @@ function showTab(t){document.querySelectorAll('.tab[data-tab]').forEach(x=>x.cla
 function renderAll(){
  if(firstLoad)return;
  const c=calc(),tr=settle(c.bal);
- document.title=(S.meta.name||'Наш бюджет')+' · Наш бюджет';
- $('groupTitle').textContent=S.meta.name||'Наш бюджет';
+ document.title=(S.meta.name||'Bill Separator')+' · Bill Separator';
+ $('groupTitle').textContent=S.meta.name||'Bill Separator';
  $('total').textContent=fmt(c.total);$('expenseCount').textContent=plural(c.ops,['операция','операции','операций']);$('memberCount').textContent=memberList().length;$('transferCount').textContent=tr.length;
  renderPickers();renderSelects();renderBills();renderHistory();renderSettle(c,tr);renderReports(c);renderSettings();renderJournal();renderMeBtn();
 }
@@ -586,7 +594,7 @@ function renderSettings(){
 
 /* ---------- данные ---------- */
 function download(blob,name){const a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
-function fileBase(){return (S.meta.name||'nash-budget').replace(/[^\p{L}\p{N}]+/gu,'-').toLowerCase()}
+function fileBase(){return (S.meta.name||'bill-separator').replace(/[^\p{L}\p{N}]+/gu,'-').toLowerCase()}
 function exportJSON(){download(new Blob([JSON.stringify({format:'nash-budget-2',exported:new Date().toISOString(),...S,presence:undefined},null,2)],{type:'application/json'}),fileBase()+'-backup.json')}
 function exportCSV(){
  const rows=[['Дата','Тип','Название','Категория','Количество','Сумма','Валюта','Курс к KZT','Сумма KZT','Плательщик','Участники']];
@@ -652,7 +660,7 @@ function toggleOwner(id,mid){
  const reuse=lastAssign&&lastAssign.item===id&&Date.now()-lastAssign.at<120e3,lid=reuse?lastAssign.log:rid(12);lastAssign={item:id,log:lid,at:Date.now()};
  putMany({['items/'+id+'/owners']:n.length?n:null,['log/'+lid]:{by:me(),at:Date.now(),a:'dish_assign',t:`«${i.name}»: ${rawNames(n)||'никто'}`}});
 }
-boot();
+if(!MOVED)boot();
 </script>
 </body>
 </html>

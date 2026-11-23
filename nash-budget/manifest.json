@@ -1,6 +1,6 @@
 {
-  "name": "Наш бюджет",
-  "short_name": "Наш бюджет",
+  "name": "Bill Separator",
+  "short_name": "Bill Separator",
   "description": "Общие расходы с друзьями: ресторанные счета и кто кому должен",
   "start_url": "./",
   "scope": "./",
