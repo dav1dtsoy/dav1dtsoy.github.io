@@ -59,6 +59,13 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:12px}
 .logrow{display:grid;grid-template-columns:48px minmax(0,1fr);gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
 .logrow .t{color:var(--muted);font-variant-numeric:tabular-nums;font-size:13px}.logrow .d{color:#3c4a44}.logrow.visit{color:var(--muted);font-size:13px}
 .by{color:#506058}
+.gcard{background:#fff;border:1px solid var(--line);border-radius:16px;margin-bottom:12px;box-shadow:0 2px 8px #1b392b08;overflow:hidden}
+.ghead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:16px;cursor:pointer;color:inherit;text-decoration:none}
+.ghead:hover{background:#f8fbf9}.ghead h3{margin:0;font-size:17px}.gtotal{font-size:20px;font-weight:800;white-space:nowrap;text-align:right}
+.glist{border-top:1px solid var(--line);padding:4px 16px}
+.brow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);color:inherit;text-decoration:none;font-size:14px}
+.brow:last-child{border-bottom:0}.brow:hover strong{text-decoration:underline}.brow .amount{font-weight:700}
+.gfoot{display:flex;gap:8px;flex-wrap:wrap;padding:10px 16px 14px;border-top:1px solid var(--line);background:#fafcfb}
 @media(max-width:650px){.summary{grid-template-columns:1fr 1fr}.summary .card:first-child{grid-column:span 2}.grid,.grid3{grid-template-columns:1fr}header{padding:18px}.big{font-size:21px}table{font-size:12px}.tab{padding:9px 11px;font-size:13px}}
 </style>
 </head>
@@ -69,6 +76,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:12px}
 <header><div class="top"><div><h1>НАШ БЮДЖЕТ</h1><p>Общие расходы с друзьями · ресторанные счета · кто кому должен</p></div><span id="landingStatus" class="pill"></span></div></header>
 <main>
 <div id="landingError" class="notice hidden" style="margin-bottom:14px"></div>
+<div id="myGroupsPanel" class="hidden"><div class="row between" style="margin:4px 2px 10px"><h2 style="margin:0;font-size:20px">Мои группы</h2><span class="sub" id="myGroupsTotal"></span></div><div id="recentGroups"></div></div>
 <div class="panel"><h2>Создать новую группу</h2>
 <p class="sub">Группа — это поездка или компания друзей. После создания вы получите ссылку: отправьте её друзьям, и все будут вести расходы вместе.</p>
 <div class="grid">
@@ -78,9 +86,8 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:12px}
 </div>
 <div class="actions"><button class="primary" id="createBtn" onclick="createGroup()">Создать группу</button></div>
 </div>
-<div class="panel"><h2>Уже есть группа?</h2>
-<div id="recentGroups"></div>
-<div class="field" style="margin-top:10px"><label>Вставьте ссылку или код группы</label><div class="linkbox"><input id="joinCode" placeholder="https://…?g=abc123 или abc123"><button onclick="joinGroup()">Открыть</button></div></div>
+<div class="panel"><h2>Присоединиться к группе</h2>
+<div class="field"><label>Вставьте ссылку или код группы</label><div class="linkbox"><input id="joinCode" placeholder="https://…?g=abc123 или abc123"><button onclick="joinGroup()">Открыть</button></div></div>
 </div>
 </main>
 </div>
@@ -213,6 +220,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:12px}
 </div>
 <div class="panel"><h2>Название группы</h2><div class="linkbox"><input id="groupNameInput"><button onclick="saveGroupName()">Сохранить</button></div></div>
 <div class="panel"><h2>Резервная копия и перенос данных</h2><p class="sub">Импорт добавляет данные из файла в эту группу — подходит и для резервной копии из старой версии «Наш бюджет — 7». Участники сопоставляются по имени.</p><div class="actions"><button onclick="exportJSON()">Скачать резервную копию JSON</button><button onclick="exportCSV()">Экспортировать в CSV</button><label class="tab" style="display:inline-flex;align-items:center;gap:6px">Импортировать JSON<input type="file" accept=".json,application/json" style="display:none" onchange="importJSON(event)"></label></div><div class="actions"><button class="danger" onclick="clearAll()">Удалить все расходы и счета</button></div></div>
+<div class="panel"><h2>Удалить группу</h2><p class="sub">Группа, все её чеки, расходы и журнал удалятся у всех участников, ссылка перестанет работать. Перед удалением можно скачать резервную копию выше.</p><div class="actions"><button class="danger" onclick="deleteGroup(gid)">Удалить группу навсегда</button></div></div>
 </section>
 </div>
 <footer>Наш бюджет · расчёты ведутся в тенге по сохранённому курсу каждой операции</footer>
@@ -245,6 +253,7 @@ function arr(x){return Array.isArray(x)?x.filter(v=>v!=null):Object.values(x||{}
 function rid(n){const a='abcdefghijkmnpqrstuvwxyz23456789',r=crypto.getRandomValues(new Uint8Array(n));return [...r].map(b=>a[b%a.length]).join('')}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function num(n){return (Math.round((n||0)*100)/100).toLocaleString('ru-RU',{maximumFractionDigits:2})}
+function plural(n,f){const a=Math.abs(n)%100,b=a%10;return n+' '+(a>10&&a<20?f[2]:b===1?f[0]:b>=2&&b<=4?f[1]:f[2])}
 function fmt(n){return num(n)+' ₸'}
 function fmtc(n,c){return num(n)+' '+(SYM[c]||c)}
 function today(){const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)}
@@ -288,28 +297,55 @@ function parseGid(s){s=String(s||'').trim();const m=s.match(/[?&]g=([a-z0-9]+)/i
 async function boot(){
  initStatic();
  gid=parseGid(location.search);
- if(!gid)return showLanding();
+ if(!gid)return showLanding(/[?&]deleted=1/.test(location.search)?'Группа удалена.':'');
  $('app').classList.remove('hidden');
  try{store=await makeStore(gid)}catch(e){return showLanding('Не удалось подключиться к серверу синхронизации. Проверьте интернет и обновите страницу.')}
  const timer=setTimeout(()=>{if(firstLoad)$('loading').textContent='Загрузка идёт дольше обычного… Проверьте подключение к интернету.'},10000);
  store.start(()=>{
+  if(!firstLoad&&!Object.keys(S.members).length){forgetGroup(gid);return location.replace(location.pathname+'?deleted=1')}
   if(firstLoad){firstLoad=false;clearTimeout(timer);
    if(!Object.keys(S.members).length&&!S.meta.name){forgetGroup(gid);return showLanding('Группа не найдена. Возможно, ссылка неполная или группа была удалена.')}
    $('loading').classList.add('hidden');$('content').classList.remove('hidden');
    activeBill=lsGet('nb-bill-'+gid,null);
+   const tab=lsGet('nb-tab-'+gid,null);if(tab){showTab(tab);localStorage.removeItem('nb-tab-'+gid)}
    if(me())noteVisit();else openWho();
    setInterval(()=>{if(me()&&!document.hidden)put('seen/'+me(),Date.now())},5*60e3)}
   rememberGroup();renderAll();
  },err=>{clearTimeout(timer);$('loading').textContent='Ошибка доступа к данным: '+err.message});
 }
-function showLanding(err){
+const groupData={};
+async function showLanding(err){
  $('app').classList.add('hidden');$('landing').classList.remove('hidden');
  $('landingStatus').textContent=CFG?'Синхронизация включена':'Без синхронизации';
  if(err){$('landingError').textContent=err;$('landingError').classList.remove('hidden')}
- const rec=lsGet('nb-recent',[]);
- $('recentGroups').innerHTML=rec.length?'<div class="sub" style="margin-bottom:6px">Недавние группы на этом устройстве:</div>'+rec.map(g=>`<div class="item itemtop"><div><strong>${esc(g.name)}</strong><div class="sub">${esc(g.members||'')}</div></div><a href="?g=${esc(g.id)}"><button class="small">Открыть</button></a></div>`).join(''):'<div class="sub">Попросите у друзей ссылку на группу.</div>';
+ const rec=lsGet('nb-recent',[]);renderMyGroups();if(!rec.length)return;
+ if(!CFG){rec.forEach(g=>groupData[g.id]=lsGet('nb-group-'+g.id,null)?norm(lsGet('nb-group-'+g.id,null)):null);return renderMyGroups()}
+ try{const {d,db}=await loadFirebase();rec.forEach(g=>d.onValue(d.ref(db,'groups/'+g.id),s=>{groupData[g.id]=s.exists()?norm(s.val()):null;renderMyGroups()},()=>{}))}catch(e){}
 }
-function rememberGroup(){let rec=lsGet('nb-recent',[]).filter(g=>g.id!==gid);rec.unshift({id:gid,name:S.meta.name||'Группа',members:memberList().map(m=>m.name).join(', ')});lsSet('nb-recent',rec.slice(0,12))}
+// временно подставляет данные чужой группы, чтобы посчитать её итоги теми же функциями
+function withS(data,fn){const o=S;S=data;try{return fn()}finally{S=o}}
+function renderMyGroups(){
+ const rec=lsGet('nb-recent',[]);$('myGroupsPanel').classList.toggle('hidden',!rec.length);let sum=0,known=0;
+ $('recentGroups').innerHTML=rec.map(g=>{const data=groupData[g.id],gone=data===null||(data&&!Object.keys(data.members).length);
+  const foot=`<div class="gfoot"><a href="?g=${esc(g.id)}"><button class="primary small">Открыть</button></a><button class="ghost small" onclick="forgetGroup('${esc(g.id)}');renderMyGroups()">Убрать из списка</button>${gone?'':`<button class="danger small" onclick="deleteGroup('${esc(g.id)}')">Удалить группу</button>`}</div>`;
+  if(gone)return `<div class="gcard"><div class="ghead"><div><h3>${esc(g.name)}</h3><div class="sub">Группа удалена или недоступна</div></div></div>${foot}</div>`;
+  if(!data)return `<div class="gcard"><a class="ghead" href="?g=${esc(g.id)}"><div><h3>${esc(g.name)}</h3><div class="sub">${esc(g.members||'')}</div></div><div class="sub">загрузка…</div></a>${foot}</div>`;
+  return withS(data,()=>{const c=calc(),bills=billsSorted(),reg=Object.values(S.expenses).filter(e=>!e.transfer),regSum=reg.reduce((a,e)=>a+e.amount*e.rate,0);sum+=c.total;known++;
+   const rows=bills.map(b=>{const bc=billCalc(b.id),n=bc.items.filter(i=>i.kind==='dish').length;return `<a class="brow" href="?g=${esc(g.id)}" onclick="lsSet('nb-bill-${esc(g.id)}','${b.id}');lsSet('nb-tab-${esc(g.id)}','restaurant')"><div><strong>🍽 ${esc(b.name)}</strong><div class="sub">${fdate(b.date)} · ${plural(n,['позиция','позиции','позиций'])} · оплатил(а) ${esc(mname(b.payer))}</div></div><span class="amount">${fmt(bc.total*(b.rate||1))}</span></a>`}).join('');
+   const regRow=reg.length?`<a class="brow" href="?g=${esc(g.id)}" onclick="lsSet('nb-tab-${esc(g.id)}','history')"><div><strong>Обычные расходы</strong><div class="sub">${plural(reg.length,['операция','операции','операций'])} — такси, жильё и т. п.</div></div><span class="amount">${fmt(regSum)}</span></a>`:'';
+   return `<div class="gcard"><a class="ghead" href="?g=${esc(g.id)}"><div><h3>${esc(S.meta.name||g.name)}</h3><div class="sub">${memberList().map(m=>esc(m.name)).join(', ')}</div></div><div><div class="gtotal">${fmt(c.total)}</div><div class="sub" style="text-align:right">${plural(bills.length,['чек','чека','чеков'])}</div></div></a>${rows||regRow?`<div class="glist">${rows}${regRow}</div>`:'<div class="glist"><div class="sub" style="padding:10px 0">Пока нет чеков и расходов</div></div>'}${foot}</div>`});
+ }).join('');
+ $('myGroupsTotal').textContent=known>1?'Всего по группам: '+fmt(sum):'';
+}
+async function deleteGroup(id){
+ const name=(groupData[id]&&groupData[id].meta.name)||(id===gid&&S.meta.name)||lsGet('nb-recent',[]).find(g=>g.id===id)?.name||'Группа';
+ const t=prompt(`Группа «${name}» и все её чеки удалятся у ВСЕХ участников без возможности восстановления.\n\nЧтобы подтвердить, введите название группы:`);
+ if(t===null)return;if(t.trim().toLowerCase()!==name.trim().toLowerCase())return toast('Название не совпало — группа не удалена');
+ try{if(CFG){const {d,db}=await loadFirebase();await d.remove(d.ref(db,'groups/'+id))}else localStorage.removeItem('nb-group-'+id);
+  forgetGroup(id);['nb-bill-','nb-me-','nb-visit-','nb-tab-'].forEach(k=>localStorage.removeItem(k+id));location.replace(location.pathname+'?deleted=1')}
+ catch(e){toast('Не удалось удалить: '+e.message)}
+}
+function rememberGroup(){let rec=lsGet('nb-recent',[]).filter(g=>g.id!==gid);rec.unshift({id:gid,name:S.meta.name||'Группа',members:memberList().map(m=>m.name).join(', ')});lsSet('nb-recent',rec.slice(0,40))}
 function forgetGroup(id){lsSet('nb-recent',lsGet('nb-recent',[]).filter(g=>g.id!==id))}
 function goHome(){location.href=location.pathname}
 function joinGroup(){const g=parseGid($('joinCode').value);if(!g)return toast('Не похоже на ссылку или код группы');location.href=location.pathname+'?g='+g}
@@ -461,7 +497,7 @@ function renderAll(){
  const c=calc(),tr=settle(c.bal);
  document.title=(S.meta.name||'Наш бюджет')+' · Наш бюджет';
  $('groupTitle').textContent=S.meta.name||'Наш бюджет';
- $('total').textContent=fmt(c.total);$('expenseCount').textContent=c.ops+' операций';$('memberCount').textContent=memberList().length;$('transferCount').textContent=tr.length;
+ $('total').textContent=fmt(c.total);$('expenseCount').textContent=plural(c.ops,['операция','операции','операций']);$('memberCount').textContent=memberList().length;$('transferCount').textContent=tr.length;
  renderPickers();renderSelects();renderBills();renderHistory();renderSettle(c,tr);renderReports(c);renderSettings();renderJournal();renderMeBtn();
 }
 let pickSig='';
