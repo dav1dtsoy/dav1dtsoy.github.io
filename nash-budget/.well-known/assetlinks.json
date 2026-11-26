@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.vercel.bill_separator.twa",
+        "sha256_cert_fingerprints": ["0C:1B:A5:DD:8F:BD:73:B3:15:12:E6:9C:41:F7:A1:A6:D8:79:0E:C1:04:6B:8F:AA:41:18:F9:FF:1E:13:76:61"]
+      }
+    }]
