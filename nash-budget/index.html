@@ -657,7 +657,7 @@ function toggleOwner(id,mid){
  const reuse=lastAssign&&lastAssign.item===id&&Date.now()-lastAssign.at<120e3,lid=reuse?lastAssign.log:rid(12);lastAssign={item:id,log:lid,at:Date.now()};
  putMany({['items/'+id+'/owners']:n.length?n:null,['log/'+lid]:{by:me(),at:Date.now(),a:'dish_assign',t:`«${i.name}»: ${rawNames(n)||'никто'}`}});
 }
-if(!MOVED)boot();
+if(!MOVED){boot();if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{})}
 </script>
 </body>
 </html>
